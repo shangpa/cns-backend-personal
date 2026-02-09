@@ -19,4 +19,18 @@
 - **해결**: Spring `@Async`를 도입하여 레시피 정보 우선 저장 후, 이미지는 백그라운드에서 비동기로 생성하도록 구조 개선 예정
 
 ## 📂 Project Structure
-(백엔드 패키지 구조를 간단히 설명)
+src/main/java/com/cns/
+├── admin/             # 관리자 전용 기능 (DTO, Enums, Logging, Service/Controller)
+├── auth/              # 인증/인가 컨트롤러 및 구글 토큰 검증 유틸
+├── recipe/            # 레시피 생성, 조회 및 관리 (Controller, Service, Repository, Entity)
+├── user/              # 사용자 정보 및 프로필 관리 (Controller, Service, Repository, Entity)
+├── ingredient/        # 식재료 데이터 관리 (Controller, Service, Repository, Entity)
+├── [기타 도메인]/       # 기타 기능별 도메인 패키지 (폴더 구조 동일)
+├── api/                   # 외부 API 연동 모듈 (Infrastructure Layer)
+│   ├── openai/            # OpenAI API (레시피 이미지 생성)
+│   ├── vision/            # Google Cloud Vision API 연동
+│   ├── translate/         # Google Translation API 연동
+│   └── ApiUsageLimiter    # API 호출량 제한 로직 (비용 및 성능 관리)
+├── jwt/                   # JWT 보안 핵심 로직 (Filter, Util, Login logic)
+├── config/                # 시스템 전역 설정 (Security, Firebase, WebSocket, Web 등)
+└── util/                  # 공통 유틸리티 (DistanceUtil, KeyGenerator 등)
