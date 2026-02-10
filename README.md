@@ -2,8 +2,7 @@
 > **레시피 공유 및 위치 기반 주방용품 공유 플랫폼**
 
 ## System Architecture & DB Design
-![ERD](./images/CNS_erd.png)
-- **데이터 모델링 전략**: 사용자 경험(UX)과 데이터 정규화를 고려한 DB 설계
+![ERD](readme/CNS_erd.png)
 - **보안**: JWT를 활용한 Stateless 인증 체계 구축
 
 ## Tech Stack
@@ -19,7 +18,7 @@
 - **위치 기반 '동네주방'**: 유저 위치 데이터를 활용한 주변 이웃 간 식재료 거래 및 실시간 채팅 서비스
 - **미디어 자원 관리**: UUID 기반 파일명 정책을 통한 보안성 확보 및 이미지/동영상 업로드 최적화
 
-## 🚀 성능 개선 및 트러블슈팅 (Troubleshooting)
+## 성능 개선 및 트러블슈팅 (Troubleshooting)
 ### 1. 외부 API 연동 지연 문제 개선 (진행 중)
 - **문제**: 레시피 작성 시 외부 API(번역 + 이미지 생성) 호출 완료 후 레시피 작성완료까지 약 20초 이상의 대기 시간 발생
 - **해결 방안**:
@@ -39,3 +38,5 @@
 * **`api`**: 외부 서비스 연동 (OpenAI, Google Vision/Translate) 및 API Quota 관리
 * **`config`**: Security, Firebase, WebSocket 등 시스템 전역 설정
 * **`util`**: 거리 계산, 키 생성 등 공통 유틸리티
+
+* [발표 PPT 다운로드 (PDF)](./readme/cns.pdf)
