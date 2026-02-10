@@ -1,36 +1,41 @@
-## 🛠 Tech Stack
+# CookAndShare (CNS) - Backend
+> **AI 기반 레시피 생성 및 위치 기반 식재료 공유 플랫폼**
+
+## System Architecture & DB Design
+![ERD](./images/CNS_erd.png)
+- **데이터 모델링 전략**: 사용자 경험(UX)과 데이터 정규화를 고려한 DB 설계
+- **보안**: JWT를 활용한 Stateless 인증 체계 구축
+
+## Tech Stack
 - **Language**: Java 17
 - **Framework**: Spring Boot 3.4.1
 - **Database**: MySQL
 - **Auth**: JWT (JSON Web Token)
-- **External API**: OpenAI API (이미지 생성), Google Translate API
+- **External API**: OpenAI API (이미지 생성),Google Cloud Vision, Google Translate API
 
-## 📌 핵심 기능
-- **AI 레시피 이미지 생성**: 사용자의 입력 키워드를 바탕으로 OpenAI API를 연동하여 레시피의 이미지 생성
-- **사용자 인증**: JWT를 활용한 보안 로그인 및 권한 관리
-- **미디어 관리**: UUID 기반 파일명 정책을 통한 이미지/동영상 업로드 및 관리
+## 주요 기능 
+- **AI 맞춤형 레시피 생성**: OpenAI API를 연동하여 텍스트 기반 레시피와 자동 썸네일 생성 로직 구현
+- **스마트 냉장고 관리**: Google Vision API를 활용한 영수증/이미지 분석 및 식재료 자동 등록 시스템
+- **위치 기반 '동네주방'**: 유저 위치 데이터를 활용한 주변 이웃 간 식재료 거래 및 실시간 채팅 서비스
+- **미디어 자원 관리**: UUID 기반 파일명 정책을 통한 보안성 확보 및 이미지/동영상 업로드 최적화
 
-## 🏗 System Architecture & DB Design
-![ERD](./images/CNS_erd.png)
-
-## 🚀 고도화 및 성능 개선 (Troubleshooting)
+## 🚀 성능 개선 및 트러블슈팅 (Troubleshooting)
 ### 1. 외부 API 연동 지연 문제 개선 (진행 중)
-- **문제**: 레시피 생성 시 번역 및 이미지 생성 API 호출이 완료될 때까지 사용자가 대기해야 하는 현상 발생 (평균 10초 이상)
-- **해결**: Spring `@Async`를 도입하여 레시피 정보 우선 저장 후, 이미지는 백그라운드에서 비동기로 생성하도록 구조 개선 예정
+- **문제**: 레시피 작성 시 외부 API(번역 + 이미지 생성) 호출 완료 후 레시피 작성완료까지 약 20초 이상의 대기 시간 발생
+- **해결 방안**:
+    - Spring **`@Async`**를 도입하여 레시피 기본 정보를 우선 DB에 저장 후 즉시 응답 반환
+    - 이미지 생성은 별도에서 백그라운드로 실행하여 사용자 체감 속도 개선 시도
 
-## 📂 Project Structure
-src/main/java/com/cns/
-├── admin/             # 관리자 전용 기능 (DTO, Enums, Logging, Service/Controller)
-├── auth/              # 인증/인가 컨트롤러 및 구글 토큰 검증 유틸
-├── recipe/            # 레시피 생성, 조회 및 관리 (Controller, Service, Repository, Entity)
-├── user/              # 사용자 정보 및 프로필 관리 (Controller, Service, Repository, Entity)
-├── ingredient/        # 식재료 데이터 관리 (Controller, Service, Repository, Entity)
-├── [기타 도메인]/       # 기타 기능별 도메인 패키지 (폴더 구조 동일)
-├── api/                   # 외부 API 연동 모듈 (Infrastructure Layer)
-│   ├── openai/            # OpenAI API (레시피 이미지 생성)
-│   ├── vision/            # Google Cloud Vision API 연동
-│   ├── translate/         # Google Translation API 연동
-│   └── ApiUsageLimiter    # API 호출량 제한 로직 (비용 및 성능 관리)
-├── jwt/                   # JWT 보안 핵심 로직 (Filter, Util, Login logic)
-├── config/                # 시스템 전역 설정 (Security, Firebase, WebSocket, Web 등)
-└── util/                  # 공통 유틸리티 (DistanceUtil, KeyGenerator 등)
+## Project Structure
+본 프로젝트는 유지보수와 확장성을 위해 **도메인 중심(Domain-Driven)** 패키지 구조를 사용하였습니다.
+### Domain Packages
+* **`admin`**: 관리자 전용 기능 (통계, 로깅, 서비스 관리)
+* **`auth` / `jwt`**: OAuth2 기반 인증 및 JWT 보안 토큰 처리
+* **`recipe`**: 핵심 비즈니스 (레시피 생성, 추천 알고리즘 및 관리)
+* **`user`**: 사용자 프로필 및 개인화 데이터 관리
+* **`ingredient`**: 식재료 데이터베이스 및 재고 관리
+
+### Infrastructure & Tools
+* **`api`**: 외부 서비스 연동 (OpenAI, Google Vision/Translate) 및 API Quota 관리
+* **`config`**: Security, Firebase, WebSocket 등 시스템 전역 설정
+* **`util`**: 거리 계산, 키 생성 등 공통 유틸리티
