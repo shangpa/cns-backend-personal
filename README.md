@@ -1,5 +1,5 @@
 # CookAndShare (CNS) - Backend
-> **AI 기반 레시피 생성 및 위치 기반 식재료 공유 플랫폼**
+> **레시피 공유 및 위치 기반 주방용품 공유 플랫폼**
 
 ## System Architecture & DB Design
 ![ERD](./images/CNS_erd.png)
@@ -14,7 +14,7 @@
 - **External API**: OpenAI API (이미지 생성),Google Cloud Vision, Google Translate API
 
 ## 주요 기능 
-- **AI 맞춤형 레시피 생성**: OpenAI API를 연동하여 텍스트 기반 레시피와 자동 썸네일 생성 로직 구현
+- **AI로 레시피 썸네일 생성**: OpenAI API를 연동하여 텍스트 기반 레시피의 썸네일 생성
 - **스마트 냉장고 관리**: Google Vision API를 활용한 영수증/이미지 분석 및 식재료 자동 등록 시스템
 - **위치 기반 '동네주방'**: 유저 위치 데이터를 활용한 주변 이웃 간 식재료 거래 및 실시간 채팅 서비스
 - **미디어 자원 관리**: UUID 기반 파일명 정책을 통한 보안성 확보 및 이미지/동영상 업로드 최적화
