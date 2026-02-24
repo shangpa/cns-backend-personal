@@ -6,6 +6,7 @@ import com.example.cns.admin.dto.RecipeStatDTO;
 import com.example.cns.admin.enums.StatType;
 import com.example.cns.admin.log.AdminLogService;
 import com.example.cns.api.OpenAiService;
+import com.example.cns.api.ThumbnailAsyncService;
 import com.example.cns.api.vision.IngredientParser;
 import com.example.cns.fridge.Fridge;
 import com.example.cns.fridge.FridgeRepository;
@@ -54,6 +55,7 @@ public class RecipeService {
 
     private static final int SUGGEST_LIMIT = 3;
 
+    private final ThumbnailAsyncService thumbnailAsyncService;
     // 전체 레시피 조회
     public List<Recipe> getAllRecipes() {
         return recipeRepository.findAll();
@@ -149,17 +151,20 @@ public class RecipeService {
             recipeIngredientRepository.saveAll(ingList);
         }
 
-        // 썸네일 자동 생성 (메인이미지 없고, 조리순서가 있을 때)
+        // 수정된 부분: 썸네일 자동 생성 로직
+        // 조건 1 & 2: 썸네일이 없고 조리순서가 있을 때만 실행 (기존 조건문 그대로 유지)
         if ((savedRecipe.getMainImageUrl() == null || savedRecipe.getMainImageUrl().isBlank())
                 && savedRecipe.getCookingSteps() != null
                 && !savedRecipe.getCookingSteps().trim().isEmpty()) {
             try {
+                // 프롬프트 생성은 기존 함수(buildPrompt)를 그대로 사용 (빠른 작업이므로 동기 처리)
                 String prompt = buildPrompt(savedRecipe);
-                String imageUrl = openAiService.generateThumbnail(prompt);
-                savedRecipe.setMainImageUrl(imageUrl);
-                // 변경감지로 저장
+
+                // 기존 동기 호출(openAiService.generateThumbnail)을 지우고 비동기 서비스 호출로 대체!
+                thumbnailAsyncService.generateAndSaveThumbnailAsync(savedRecipe.getRecipeId(), prompt);
+
             } catch (Exception e) {
-                // 로깅만
+                System.err.println("썸네일 비동기 호출 중 에러: " + e.getMessage());
             }
         }
 
