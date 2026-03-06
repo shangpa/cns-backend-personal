@@ -1,5 +1,11 @@
 # CookAndShare (CNS) - Backend
 > **레시피 공유 및 위치 기반 주방용품 공유 플랫폼**
+---
+**안내 사항**
+이 레포지토리는 팀 졸업작품인 CookAndShare의 백엔드(Spring Boot) 파트를 리팩토링하기 위해 분리한 프로젝트입니다.
+* **원본 팀 프로젝트 레포지토리**: [https://github.com/shangpa/CnsSpring]
+* **주요 변경 사항**: 기존 코드를 베이스로 성능 개선(비동기 처리 등), 예외 처리, 코드 아키텍처 개선을 지속적으로 진행하고 있습니다.
+---
 
 ## System Architecture & DB Design
 ![ERD](readme/CNS_erd.png)
