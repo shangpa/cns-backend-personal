@@ -1,8 +1,7 @@
-package com.example.cns.controller;
+package com.example.cns.User;
 
 import com.example.cns.dto.JoinDTO;
 import com.example.cns.jwt.ApiResponse;
-import com.example.cns.User.JoinService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

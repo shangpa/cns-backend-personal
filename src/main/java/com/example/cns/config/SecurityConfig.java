@@ -81,6 +81,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // 기존 공개 엔드포인트 유지
+
                         .requestMatchers(
                                 "/login", "/", "/join", "/admin/join",
                                 "/api/auth/**",
@@ -88,7 +89,10 @@ public class SecurityConfig {
                                 "/api/recipes/search", "/api/shorts/search", "/api/search/popular-keywords", "/api/search/save",
                                 "/api/trade-posts", "/api/trade-posts/**", "/api/main",
                                 "/api/boards/mine", "/trade-posts/popular",
-                                "/api/recipes/seasonal", "/ws/**", "/error"
+                                "/api/recipes/seasonal", "/ws/**", "/error",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
                         ).permitAll()
 
                         // 나머지는 인증

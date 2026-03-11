@@ -6,7 +6,7 @@
 * **원본 팀 프로젝트 레포지토리**: [https://github.com/shangpa/CnsSpring]
 * **주요 변경 사항**: 기존 코드를 베이스로 성능 개선(비동기 처리 등), 예외 처리, 코드 아키텍처 개선을 지속적으로 진행하고 있습니다.
 ---
-
+  
 ## System Architecture & DB Design
 ![ERD](readme/CNS_erd.png)
 - **보안**: JWT를 활용한 Stateless 인증 체계 구축
