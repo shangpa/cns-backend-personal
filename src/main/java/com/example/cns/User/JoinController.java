@@ -19,7 +19,7 @@ public class JoinController {
         this.joinService = joinService;
     }
 
-    @PostMapping("/join")
+    @PostMapping("/api/user/auth/join")
     public ResponseEntity<ApiResponse> joinProcess(@RequestBody JoinDTO joinDTO) {
         // 회원가입 처리 결과
         boolean isJoined = joinService.joinProcess(joinDTO);

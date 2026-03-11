@@ -54,7 +54,7 @@ public class ShortsVideoController {
     }*/
 
     // 최종 등록 (로그인 필요)
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<Long> registerShorts(
             @RequestBody RecipeShortCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -83,16 +83,21 @@ public class ShortsVideoController {
         }
     }
 
-    // 최신 숏츠
-    @GetMapping("/latest")
-    public ResponseEntity<List<ShortsVideo>> getLatest() {
-        return ResponseEntity.ok(shortsVideoService.getLatestShorts());
-    }
+    //기본값 최신쇼츠 popular 가 들어오면 인기쇼츠 반환
+    @GetMapping
+    public ResponseEntity<List<ShortsVideo>> getShorts(
+            @RequestParam(defaultValue = "latest") String sort
+    ) {
 
-    // 인기 숏츠
-    @GetMapping("/popular")
-    public ResponseEntity<List<ShortsVideo>> getPopular() {
-        return ResponseEntity.ok(shortsVideoService.getPopularShorts());
+        List<ShortsVideo> shorts;
+
+        if (sort.equals("popular")) {
+            shorts = shortsVideoService.getPopularShorts();
+        } else {
+            shorts = shortsVideoService.getLatestShorts();
+        }
+
+        return ResponseEntity.ok(shorts);
     }
 
     // 조회수 증가

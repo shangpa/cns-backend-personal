@@ -3,6 +3,7 @@ package com.example.cns.User;
 import com.example.cns.dto.CustomUserDetails;
 import com.example.cns.dto.LoginInfoResponse;
 import com.example.cns.dto.UserUpdateRequestDTO;
+import com.example.cns.mypage.MyWriteRecipeResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,7 +62,7 @@ public class UserController {
 
 
     // 마이페이지 개인정보수정
-    @PutMapping("/update")
+    @PutMapping("/me")
     public ResponseEntity<?> updateUserInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody UserUpdateRequestDTO dto) {
@@ -88,7 +89,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/check-password")
+    @PostMapping("/auth/verify-password")
     public ResponseEntity<?> checkPassword(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody Map<String, String> body
@@ -100,16 +101,17 @@ public class UserController {
         return ResponseEntity.ok(matches);
     }
 
-    @GetMapping("/id")
+    @GetMapping
     public ResponseEntity<Long> getUserIdByUsername(@RequestParam String username) {
         UserEntity user = userRepository.findByUsername(username);
         return ResponseEntity.ok((long) user.getId());
     }
+
     //id로 이름찾기
-    @GetMapping("/profile-by-id")
+    @GetMapping("/profile-by-{id}/name")
     public ResponseEntity<Map> getUsernameById(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam Long id
+            @PathVariable("id") Long id
     ) {
         // (Optional) 인증된 사용자 확인
         if (userDetails == null) {
@@ -125,4 +127,5 @@ public class UserController {
 
         return ResponseEntity.ok(Map.of("username", user.getUsername()));
     }
+
 }

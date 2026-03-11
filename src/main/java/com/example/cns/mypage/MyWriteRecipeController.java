@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user/recipes")
+@RequestMapping("/api/users")
 public class MyWriteRecipeController {
 
     private final JWTUtil jwtUtil;
@@ -30,12 +30,12 @@ public class MyWriteRecipeController {
     }
 
 
-    @GetMapping
+    @GetMapping("/me/recipes")
     public ResponseEntity<MyWriteRecipeResponseDTO> getMyRecipes(
             @RequestHeader("Authorization") String token,
             @RequestParam String sort,
             @RequestParam(required = false) List<String> categories,
-            @RequestParam(required = false) Long userId   // ✅ 추가
+            @RequestParam(required = false) Long userId   // 어차피 자기꺼만 가져올거니까여서 인데 왜 다른사람꺼도 가져오는기능이지
     ) {
         // 기존 로직 그대로
         String username = jwtUtil.getUsername(token);
@@ -70,11 +70,6 @@ public class MyWriteRecipeController {
         return ResponseEntity.ok(new MyWriteRecipeResponseDTO(dtoList.size(), dtoList));
     }
 
-    private String extractBearerToken(String authHeader) {
-        if (authHeader == null) return null;
-        // "Bearer xxx" or "Bearerxxx" 둘 다 방어
-        return authHeader.replaceFirst("(?i)^Bearer\\s+", "");
-    }
 
     // ✅ 여기 아래에 추가해줘
     private String convertToEnumFormat(String text) {
@@ -92,7 +87,7 @@ public class MyWriteRecipeController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me/recipes/{id}")
     public ResponseEntity<Void> deleteMyRecipe(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") int recipeId
@@ -107,7 +102,7 @@ public class MyWriteRecipeController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/me/recipes/{id}")
     public ResponseEntity<MyWriteRecipeDTO> getMyRecipeDetail(
             @RequestHeader("Authorization") String token,
             @PathVariable("id") int recipeId
