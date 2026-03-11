@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "metal-ring-459306-r3",
+  "private_key_id": "fc3b934fd1dcd949cba20a0d76b8325d019ae363",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC3ABallX3WZpN/\noocyW/LFaC1QxdLr8dPejPaJaj3s4QPcP0R9OKr2dxpChax5YywmwBa07WWLV+7e\n9edNFk60DnwlsCzQStPFmCfqqwv/NypyLF0iXmGC66hxQKXkFWslSQjrZt4F4BSR\n9AUPMaEyr5JFL9eY+JjThovRviRLPYmZvXT/GYGhO0wf8ZuKuLDzMGmrcJOuX2LV\nyi4LknGVhY1o+G4H5FmzSXOVMhxoW5Pj1EmVy3DJvXb6LDuB3Zddc5puGJVpA2Us\nhwwBj4XBDz3nS9qXzSUoAkdx0k7Nf9/huJ8p2ZtmUYFWHBHXLVhXYlKTllAsXHJF\nGqBm/CCHAgMBAAECggEAEiJfHCTWkHgfu7Eru+YisO85i7HezI9tPbYy+WZey+oh\ntiH1iSx5Z0Jhhsq0+bPF0fKNDXwiPjmw1nAAbhd80G5IXSUP0SA+dhaK4L/3Hgul\nws9PTLLqRM1SJs7k4YJB2N2w6urfANlgux829SInkDHtHmVhnwCw3Efj88fnftER\n+UNkp02uOYO+0+9b81LyujsGd0FgLGcn/HNVmA66auLXp9/lOs8YsSLnF41ajnLg\nQDPqrXenm0Phu1NvGelWImGDV+xGtA1rXkDyPuCN1ZX6VUWH8puSrZRAdTyoVG3P\ngI9ZzQYtVgJ85pCJnppbKWxCJHjNCirovgvfKPeYeQKBgQD5KatiX9yVk9Eagfn1\ncnkiLaRUmeCMkKjfmoEjn9rG1yBrB6+VvAAOj+V36TYfhBfQRtd82mrX37ADO9Ox\nmgUUph1ECOR4yqhJTnXmBnCo+B3Rs6yN62zgW5PX7FeqkIlNTCqb/MX3pxHmUfVV\n2j65fpZ8dffetR48Hwz0bwpW0wKBgQC8BaNVwFmSbqZEmnOjn7Ilis886P5blia1\nwYVFamCtRMOdBgwb+jPpylvrYxFjWXC2rkJx1GvruTuL0gJnjt98aDlgGfsZs6aD\nkL2nBPT4sCSNYfHmYCica8QDRVBFJJwfNBBy3+vnfN+z4zS/QRanNl+b540rsggo\nk77QAPsm/QKBgQD3C43WmF3KISnvMnh4GOxqKv8IsxmlxbjrG/J3NARjquGFvbUm\nraUQyzQmVKFJVluWMudt79KIAE4wpp0bNy9abeoOjxKZgbaiGJ1lWXVS09AdIB0z\nCf6F5ccNDFVP1MeOULretx5CkvB4gULTwPT4Tr8+4GjH9KTpz4+0vHRv6QKBgDHE\ngEZbYpoq5aG1DDTcOWhMhKxHs8QES3zCm4cTMEHMuMZgamYhZQpWANyeXWThsL76\nAyZkJqi/X+6TiQVmQOuKHt28IsXb0pByiHCkFD+bSCGQMlpbS4ST1c9T0npqxVRR\nEKWHdcbRO9k+o6CYFuntr4Lx2GEff59V9CTUjaX1AoGBAJxtUIO/NwcqYIYCwyy1\n9l+GqJxLCDuv+6EbryMFbLkCW1XL32NapES8scTL0/Y8tkRZo/WhK5X/jwOZRz5P\n1WySPGP09YL3Cw3OhvTu5KOhg87m161oIxtxlVpknCizUll7BYpy8C+qPyE/W7Oj\nrckHkaFpwleL6VYZHjzDBoKU\n-----END PRIVATE KEY-----\n",
+  "client_email": "cloud-vision-api@metal-ring-459306-r3.iam.gserviceaccount.com",
+  "client_id": "117881887243053132869",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloud-vision-api%40metal-ring-459306-r3.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
