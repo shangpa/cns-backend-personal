@@ -27,7 +27,7 @@ public class LikeRecipeController {
     private final UserRepository userRepository;
     private final PointService pointService;
     private final FCMService fcmService;
-    @PostMapping("/{recipeId}/like-toggle")
+    @PostMapping("/{recipeId}/likes")
     public ResponseEntity<String> toggleLikeRecipe(
             @PathVariable Long recipeId,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -119,7 +119,7 @@ public class LikeRecipeController {
     }
 
     // 메인 화면 - 로그인한 사용자의 찜한 레시피
-    @GetMapping("/like/list")
+    @GetMapping("liked")
     public ResponseEntity<List<RecipeSearchResponseDTO>> getLikedRecipesForMain(
             @AuthenticationPrincipal UserDetails userDetails
     ) {

@@ -64,7 +64,7 @@ public class BoardController {
 
 
     //좋아요 기능
-    @PostMapping("/{id}/like")
+    @PostMapping("/{id}/likes")
     public ResponseEntity<?> likeBoard(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         UserEntity user = userRepository.findByUsername(userDetails.getUsername());
         Board board = boardRepository.findById(id).orElseThrow();
@@ -96,7 +96,7 @@ public class BoardController {
     }
 
     //댓글 작성
-    @PostMapping("/{id}/comment")
+    @PostMapping("/{id}/comments")
     public ResponseEntity<?> addComment(@PathVariable Long id,
                                         @RequestBody CommentRequestDTO dto,
                                         @AuthenticationPrincipal UserDetails userDetails) {

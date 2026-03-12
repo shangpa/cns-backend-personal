@@ -15,14 +15,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/chat-room")
+@RequestMapping("/api")
 public class ChatRoomController {
 
     private final ChatRoomService chatRoomService;
     private final TradePostRepository tradePostRepository;
     private final UserRepository userRepository;
 
-    @PostMapping
+    @PostMapping("/chat-room")
     public ResponseEntity<ChatRoomResponseDTO> createOrGetRoom(
             @RequestParam Long postId,
             @AuthenticationPrincipal UserDetails userDetails
@@ -47,7 +47,7 @@ public class ChatRoomController {
     }
 
     //채팅방 리스트 조회
-    @GetMapping("/list")
+    @GetMapping("/chat-rooms")
     public ResponseEntity<List<ChatRoomListResponseDTO>> getUserChatRooms(
             @AuthenticationPrincipal UserDetails userDetails) {
 

@@ -58,7 +58,7 @@ public class FridgeController {
     }
 
     // 로그인한 사용자의 냉장고 항목 조회 (GET)
-    @GetMapping("/my")
+    @GetMapping("/me")
     public ResponseEntity<List<Fridge>> getMyFridges(@AuthenticationPrincipal UserDetails userDetails) {
         // 현재 로그인한 사용자명 가져오기
         String username = userDetails.getUsername();
@@ -81,27 +81,37 @@ public class FridgeController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete-by-name")
-    public ResponseEntity<Void> deleteFridgesByName(
-            @RequestParam String ingredientName,
-            @AuthenticationPrincipal UserDetails userDetails) {
 
-        UserEntity user = userRepository.findOptionalByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    @DeleteMapping
+    public ResponseEntity<Void> deleteFridgesByName(
+            @RequestParam(name = "name") String ingredientName,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserEntity user = userDetails.getUserEntity();
 
         fridgeService.deleteFridgesByName(ingredientName, user);
+
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/use-ingredients")
-    public ResponseEntity<?> useIngredients(@RequestBody List<UsedIngredientDTO> list,
-                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        fridgeService.useIngredients(list, userDetails.getUserEntity());
-        System.out.println("useIngredients 진입");
+
+
+    @PutMapping("/ingredients")
+    public ResponseEntity<?> useIngredients(
+            @RequestBody List<UsedIngredientDTO> list,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) {
             System.out.println("userDetails가 null입니다");
-            return ResponseEntity.status(403).body("인증된 사용자 정보가 없습니다");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("인증된 사용자 정보가 없습니다");
         }
+
+        // 2. 안전하게 서비스 로직 호출
+        fridgeService.useIngredients(list, userDetails.getUserEntity());
+
         return ResponseEntity.ok().build();
     }
 

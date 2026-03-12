@@ -23,7 +23,7 @@ public class SavedTradePostController {
     private final TradePostRepository tradePostRepository;
     private final UserRepository userRepository;
 
-    @PostMapping("/{postId}/save-toggle")
+    @PostMapping("/{postId}/bookmarks")
     public ResponseEntity<String> toggleSaveTradePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -47,7 +47,7 @@ public class SavedTradePostController {
         return ResponseEntity.ok("찜 토글 완료");
     }
 
-    @GetMapping("/saved")
+    @GetMapping("/bookmarked")
     public ResponseEntity<List<Long>> getSavedTradePosts(
             @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -62,7 +62,7 @@ public class SavedTradePostController {
         return ResponseEntity.ok(savedIds);
     }
 
-    @GetMapping("/{postId}/saved")
+    @GetMapping("/{postId}/bookmarks")
     public ResponseEntity<Boolean> isTradePostSaved(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserDetails userDetails) {

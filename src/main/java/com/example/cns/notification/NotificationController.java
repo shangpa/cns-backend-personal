@@ -58,7 +58,7 @@ public class NotificationController {
     }
 
     //읽은알림삭제
-    @DeleteMapping("/read/all")
+    @DeleteMapping
     public ResponseEntity<Void> deleteAllReadNotifications(@RequestHeader("Authorization") String token) {
         String username = jwtUtil.getUsername(token);
         UserEntity user = userRepository.findByUsername(username);

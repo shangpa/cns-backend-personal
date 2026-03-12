@@ -33,7 +33,7 @@ public class PointController {
     }
 
     // 포인트 차감 (테스트용)
-    @PostMapping("/use")
+    @PostMapping("/me/usage")
     public ResponseEntity<String> usePoint(
             @RequestParam int userId,
             @RequestParam int amount,
@@ -52,7 +52,7 @@ public class PointController {
         return ResponseEntity.ok(history);
     }
     //남은 포인트 조회
-    @GetMapping("/my-point")
+    @GetMapping("/me/point")
     public ResponseEntity<Integer> getMyPoint(@AuthenticationPrincipal CustomUserDetails userDetails) {
         String username = userDetails.getUsername();
         System.out.println("로그인한 유저네임 = " + username);
@@ -66,7 +66,7 @@ public class PointController {
     }
 
     //포인트 사용내역
-    @GetMapping("/my-history")
+    @GetMapping("/me/history")
     public ResponseEntity<List<PointHistoryResponseDTO>> getMyHistory(@AuthenticationPrincipal CustomUserDetails userDetails) {
         String username = userDetails.getUsername(); // 로그인한 유저의 ID 또는 username
         UserEntity user = userRepository.findByUsername(username);

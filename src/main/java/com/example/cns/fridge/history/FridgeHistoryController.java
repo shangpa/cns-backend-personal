@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/fridge-history")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class FridgeHistoryController {
 
@@ -19,7 +19,7 @@ public class FridgeHistoryController {
     private final UserRepository userRepository;
 
     //특정 재료명에 대한 이력 조회
-    @GetMapping
+    @GetMapping("/fridge-history")
     public ResponseEntity<List<FridgeHistoryResponse>> getHistoryByIngredient(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam String ingredientName
@@ -33,7 +33,7 @@ public class FridgeHistoryController {
     }
 
     //로그인한 사용자의 모든 재료 이력 조회
-    @GetMapping("/all")
+    @GetMapping("/fridge-histories/me")
     public ResponseEntity<List<FridgeHistoryResponse>> getAllHistoryByUser(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
