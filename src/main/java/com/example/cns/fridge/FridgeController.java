@@ -18,6 +18,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
+/**
+ * @deprecated 레거시 냉장고 API입니다. {@link com.example.cns.pantry.PantryController} 를 사용하세요.
+ */
+@Deprecated
 @Slf4j
 @RestController
 @RequestMapping("/api/fridges")

@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * @deprecated 레거시 냉장고 API입니다. {@link com.example.cns.pantry.PantryHistoryController} 를 사용하세요.
+ */
+@Deprecated
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor

@@ -9,6 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * @deprecated 레거시 냉장고 API입니다. {@link com.example.cns.pantry.PantryStatsController} 를 사용하세요.
+ */
+@Deprecated
 // REST API 컨트롤러임을 명시
 @RestController
 // 공통 URL prefix 지정 -> /api/fridges/stats 로 시작하는 요청을 처리
