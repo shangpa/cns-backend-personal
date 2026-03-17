@@ -4,6 +4,7 @@ import com.example.cns.User.UserEntity;
 import com.example.cns.User.UserRepository;
 import com.example.cns.notification.FCMService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/boards")
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class BoardController {
     @PostMapping
     public ResponseEntity<BoardResponseDTO> createBoard(@RequestBody BoardRequestDTO dto,
                                                         @AuthenticationPrincipal UserDetails userDetails) {
-        System.out.println("userDetails: " + userDetails);
+        log.debug("userDetails: {}", userDetails);
         BoardResponseDTO response = boardService.create(dto, userDetails.getUsername());
         return ResponseEntity.ok(response);
     }

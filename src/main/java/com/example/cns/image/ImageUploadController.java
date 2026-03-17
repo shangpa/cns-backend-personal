@@ -1,6 +1,7 @@
 package com.example.cns.image;
 
 import com.example.cns.jwt.JWTUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class ImageUploadController {
@@ -41,7 +43,7 @@ public class ImageUploadController {
 
         // 🔹 2️⃣ 토큰에서 사용자 정보 추출 (로그 기록)
         String username = jwtUtil.getUsername(jwtToken);
-        System.out.println("이미지 업로드 요청 - 사용자: " + username);
+        log.debug("이미지 업로드 요청 - 사용자: {}", username);
 
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 파일이 비어 있습니다.");

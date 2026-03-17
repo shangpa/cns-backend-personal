@@ -4,6 +4,7 @@ import com.example.cns.dto.CustomUserDetails;
 import com.example.cns.dto.LoginInfoResponse;
 import com.example.cns.User.UserEntity;
 import com.example.cns.User.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class MainController {
@@ -33,7 +35,7 @@ public class MainController {
 
         // username 추출
         String userName = customUserDetails.getUsername();
-        System.out.println("유저네임: " + userName);
+        log.debug("유저네임: {}", userName);
 
         // username을 기반으로 name을 가져오는 방법 (DB에서 조회)
         UserEntity userEntity = userRepository.findByUsername(userName);  // UserRepository를 통해 DB에서 사용자 정보 가져오기

@@ -25,6 +25,7 @@ import com.example.cns.review.Recipe.ReviewRepository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecipeService {
@@ -106,22 +108,22 @@ public class RecipeService {
         if (Boolean.TRUE.equals(dto.getIsDraft())) {
             throw new IllegalArgumentException("초안은 /api/recipes/drafts 엔드포인트를 사용하세요.");
         }
-        System.out.println("📥 createRecipe 호출됨");
-        System.out.println("username = " + username);
-        System.out.println("dto.title = " + dto.getTitle());
-        System.out.println("dto.category = " + dto.getCategory());
-        System.out.println("dto.difficulty = " + dto.getDifficulty());
-        System.out.println("dto.tags = " + dto.getTags());
-        System.out.println("dto.cookingTime = " + dto.getCookingTime());
-        System.out.println("dto.servings = " + dto.getServings());
-        System.out.println("dto.isPublic = " + dto.getIsPublic());
-        System.out.println("dto.isDraft = " + dto.getIsDraft());
-        System.out.println("dto.mainImageUrl = " + dto.getMainImageUrl());
-        System.out.println("dto.videoUrl = " + dto.getVideoUrl());
-        System.out.println("dto.ingredients = " + dto.getIngredients());
-        System.out.println("dto.alternativeIngredients = " + dto.getAlternativeIngredients());
-        System.out.println("dto.handlingMethods = " + dto.getHandlingMethods());
-        System.out.println("dto.cookingSteps = " + dto.getCookingSteps());
+        log.debug("createRecipe 호출됨");
+        log.debug("username = {}", username);
+        log.debug("dto.title = {}", dto.getTitle());
+        log.debug("dto.category = {}", dto.getCategory());
+        log.debug("dto.difficulty = {}", dto.getDifficulty());
+        log.debug("dto.tags = {}", dto.getTags());
+        log.debug("dto.cookingTime = {}", dto.getCookingTime());
+        log.debug("dto.servings = {}", dto.getServings());
+        log.debug("dto.isPublic = {}", dto.getIsPublic());
+        log.debug("dto.isDraft = {}", dto.getIsDraft());
+        log.debug("dto.mainImageUrl = {}", dto.getMainImageUrl());
+        log.debug("dto.videoUrl = {}", dto.getVideoUrl());
+        log.debug("dto.ingredients = {}", dto.getIngredients());
+        log.debug("dto.alternativeIngredients = {}", dto.getAlternativeIngredients());
+        log.debug("dto.handlingMethods = {}", dto.getHandlingMethods());
+        log.debug("dto.cookingSteps = {}", dto.getCookingSteps());
 
         UserEntity user = userRepository.findByUsername(username);
 
@@ -164,7 +166,7 @@ public class RecipeService {
                 thumbnailAsyncService.generateAndSaveThumbnailAsync(savedRecipe.getRecipeId(), prompt);
 
             } catch (Exception e) {
-                System.err.println("썸네일 비동기 호출 중 에러: " + e.getMessage());
+                log.error("썸네일 비동기 호출 중 에러: {}", e.getMessage());
             }
         }
 

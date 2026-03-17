@@ -1,6 +1,7 @@
 package com.example.cns.fridge.recommend;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/fridge/recommend")
 @RequiredArgsConstructor
@@ -23,20 +25,20 @@ public class FridgeRecommendController {
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody RecipeRecommendRequestDTO requestDTO
     ) {
-        // ✅ 전달된 재료 ID 확인 로그
-        System.out.println("========== [FridgeRecommendController] ==========");
-        System.out.println("요청 유저: " + (userDetails != null ? userDetails.getUsername() : "비로그인"));
-        System.out.println("전달된 ingredientIds: " + requestDTO.getSelectedIngredientIds());
-        System.out.println("===============================================");
+        // 전달된 재료 ID 확인 로그
+        log.debug("[FridgeRecommendController] 요청 유저: {}", (userDetails != null ? userDetails.getUsername() : "비로그인"));
+        log.debug("[FridgeRecommendController] 전달된 ingredientIds: {}", requestDTO.getSelectedIngredientIds());
 
         List<Long> ids = requestDTO.getSelectedIngredientIds();
         if (ids != null && !ids.isEmpty()) {
             List<RecipeRecommendResponseDTO> result = fridgeRecommendService.recommendRecipes(ids);
-            System.out.println("추천된 레시피 개수: " + result.size());
-            result.forEach(r -> System.out.println(" - " + r.getTitle() + " (id=" + r.getRecipeId() + ")"));
+            log.debug("추천된 레시피 개수: {}", result.size());
+            for (RecipeRecommendResponseDTO r : result) {
+                log.debug(" - {} (id={})", r.getTitle(), r.getRecipeId());
+            }
             return ResponseEntity.ok(result);
         }
-        System.out.println("⚠️ 전달된 재료 ID가 없음!");
+        log.warn("전달된 재료 ID가 없음!");
         return ResponseEntity.ok(List.of());
     }
 }

@@ -1,6 +1,7 @@
 package com.example.cns.image;
 
 import com.example.cns.jwt.JWTUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class VideoUploadController {
@@ -39,7 +41,7 @@ public class VideoUploadController {
         }
 
         String username = jwtUtil.getUsername(jwtToken);
-        System.out.println("🎥 동영상 업로드 요청 - 사용자: " + username);
+        log.debug("동영상 업로드 요청 - 사용자: {}", username);
 
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비디오 파일이 비어 있습니다.");
@@ -60,7 +62,7 @@ public class VideoUploadController {
             String fileUrl = "/uploads/videos/" + newFileName;
 
             // 실제 저장 경로 로그 출력
-            System.out.println("📝 저장된 파일 경로: " + filePath.toAbsolutePath());
+            log.debug("저장된 파일 경로: {}", filePath.toAbsolutePath());
 
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_PLAIN)

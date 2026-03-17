@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -66,7 +68,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // Authorization 헤더 확인
         String authHeader = request.getHeader("Authorization");
-        System.out.println("[JWTFilter] Authorization: " + authHeader + " | uri=" + requestURI);
+        log.debug("[JWTFilter] Authorization: {} | uri={}", authHeader, requestURI);
 
         // ✅ 토큰이 없거나 형식이 아니면 '그냥 통과'
         // (인증이 필요한 경로는 뒤 단계에서 Spring Security가 막는다.
@@ -80,7 +82,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // ✅ 만료 토큰도 조용히 통과(403 금지). 인증은 세팅하지 않음.
         if (jwtUtil.isExpired(token)) {
-            System.out.println("[JWTFilter] token expired");
+            log.warn("[JWTFilter] token expired");
             filterChain.doFilter(request, response);
             return;
         }
@@ -88,7 +90,7 @@ public class JWTFilter extends OncePerRequestFilter {
         // ✅ 토큰이 유효하면만 사용자 조회 및 인증 세팅
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
-        System.out.println("[JWTFilter] username=" + username + ", role=" + role);
+        log.debug("[JWTFilter] username={}, role={}", username, role);
 
         UserEntity userEntity = userRepository.findByUsername(username);
 
@@ -97,7 +99,7 @@ public class JWTFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json; charset=UTF-8");
             response.getWriter().write("{\"error\": \"차단된 회원입니다.\"}");
-            System.out.println("[JWTFilter] blocked user: " + username);
+            log.warn("[JWTFilter] blocked user: {}", username);
             return;
         }
 
@@ -108,7 +110,7 @@ public class JWTFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authToken);
         } else {
             // 유저가 없으면 인증 세팅 없이 통과 (인증 필요한 곳은 나중에 거부됨)
-            System.out.println("[JWTFilter] user not found for token");
+            log.warn("[JWTFilter] user not found for token");
         }
 
         filterChain.doFilter(request, response);

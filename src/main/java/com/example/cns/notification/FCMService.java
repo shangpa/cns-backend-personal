@@ -7,10 +7,12 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FCMService {
@@ -30,7 +32,7 @@ public class FCMService {
                     .build();
 
             FirebaseMessaging.getInstance().send(message);
-            System.out.println("✅ FCM 전송 성공");
+            log.debug("FCM 전송 성공");
 
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
@@ -59,7 +61,7 @@ public class FCMService {
             try {
                 firebaseMessaging.send(message);
             } catch (FirebaseMessagingException e) {
-                System.out.println("FCM 전송 실패"+e);
+                log.warn("FCM 전송 실패: {}", e.toString());
             }
         }
     }
@@ -78,12 +80,12 @@ public class FCMService {
             try {
                 firebaseMessaging.send(message);
             } catch (FirebaseMessagingException e) {
-                System.out.println("FCM 전송 실패"+e);
-                System.out.println("실패한 토큰: " + token.getFcmToken());
-                System.out.println("사용자 ID: " + user.getId());
+                log.warn("FCM 전송 실패: {}", e.toString());
+                log.warn("실패한 토큰: {}", token.getFcmToken());
+                log.warn("사용자 ID: {}", user.getId());
                 if (e.getMessage().contains("Requested entity was not found")) {
                     deviceTokenRepository.delete(token);
-                    System.out.println("🗑️ 무효한 FCM 토큰 삭제됨: " + token.getFcmToken());
+                    log.warn("무효한 FCM 토큰 삭제됨: {}", token.getFcmToken());
                 }
             }
         }

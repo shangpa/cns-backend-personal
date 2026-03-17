@@ -1,6 +1,7 @@
 package com.example.cns.api;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class OpenAiService {
@@ -28,13 +30,13 @@ public class OpenAiService {
     private String apiUrl;
 
     public String generateThumbnail(String prompt) {
-        System.out.println("요청 prompt (원문): " + prompt);
+        log.debug("요청 prompt (원문): {}", prompt);
         if (prompt == null || prompt.isBlank() || prompt.length() < 10) {
             throw new IllegalArgumentException("⚠️ 프롬프트가 너무 짧거나 비어 있습니다.");
         }
 
         String translatedPrompt = googleTranslateService.translateToEnglish(prompt);
-        System.out.println("번역된 prompt: " + translatedPrompt);
+        log.debug("번역된 prompt: {}", translatedPrompt);
 
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(30_000); // 30초
@@ -58,11 +60,11 @@ public class OpenAiService {
         JSONObject responseJson = new JSONObject(response.getBody());
         String openAiImageUrl = responseJson.getJSONArray("data").getJSONObject(0).getString("url");
 
-        System.out.println("OpenAI 이미지 생성 URL: " + openAiImageUrl);
+        log.debug("OpenAI 이미지 생성 URL: {}", openAiImageUrl);
 
         // 🔽 여기가 핵심: 외부 이미지 → 서버 저장 → 내부 URL 반환
         String localImageUrl = downloadAndStoreImageLocally(openAiImageUrl);
-        System.out.println("서버에 저장된 썸네일 URL: " + localImageUrl);
+        log.debug("서버에 저장된 썸네일 URL: {}", localImageUrl);
 
         return localImageUrl;
     }

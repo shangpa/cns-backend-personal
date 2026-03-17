@@ -4,12 +4,14 @@ import com.example.cns.User.UserEntity;
 import com.example.cns.User.UserRepository;
 import com.example.cns.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/point")
@@ -55,7 +57,7 @@ public class PointController {
     @GetMapping("/me/point")
     public ResponseEntity<Integer> getMyPoint(@AuthenticationPrincipal CustomUserDetails userDetails) {
         String username = userDetails.getUsername();
-        System.out.println("로그인한 유저네임 = " + username);
+        log.debug("로그인한 유저네임 = {}", username);
 
         UserEntity realTimeUser = userRepository.findByUsername(username);
 

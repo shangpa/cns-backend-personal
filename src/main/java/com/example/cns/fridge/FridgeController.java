@@ -7,6 +7,7 @@ import com.example.cns.dto.CustomUserDetails;
 import com.example.cns.fridge.history.FridgeHistoryResponse;
 import com.example.cns.fridge.history.FridgeHistoryService;
 import com.example.cns.jwt.JWTUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/fridges")
 public class FridgeController {
@@ -105,7 +107,7 @@ public class FridgeController {
             @RequestBody List<UsedIngredientDTO> list,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) {
-            System.out.println("userDetails가 null입니다");
+            log.warn("userDetails가 null입니다");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("인증된 사용자 정보가 없습니다");
         }
 

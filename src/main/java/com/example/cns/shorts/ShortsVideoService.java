@@ -3,6 +3,7 @@ package com.example.cns.shorts;
 import com.example.cns.User.UserEntity;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShortsVideoService {
@@ -92,9 +94,7 @@ public class ShortsVideoService {
 
         var rows = shortsVideoRepository.findRandomBySeedPositional(s, offset, limit);
 
-        System.out.println("[randomBySeed] seed=" + s +
-                ", page=" + page + ", size=" + size +
-                ", offset=" + offset + ", fetched=" + rows.size());
+        log.debug("[randomBySeed] seed={}, page={}, size={}, offset={}, fetched={}", s, page, size, offset, rows.size());
 
         return rows.stream().map(ShortsListDto::from).toList();
     }

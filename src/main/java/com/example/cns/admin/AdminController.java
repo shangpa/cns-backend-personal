@@ -1,4 +1,4 @@
- package com.example.cns.admin;
+package com.example.cns.admin;
 
 import com.example.cns.User.JoinService;
 import com.example.cns.User.UserEntity;
@@ -30,6 +30,7 @@ import com.example.cns.tradepost.TradePostRepository;
 import com.example.cns.tradepost.TradePostService;
 import com.example.cns.tradepost.TradePostSimpleResponseDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -85,7 +87,7 @@ public class AdminController {
     // 테스트용 관리자 전용 API
     @GetMapping("/test")
     public ResponseEntity<String> adminOnlyApi() {
-        System.out.println("관리자 :"+Thread.currentThread().getName()+"로그인");
+        log.debug("관리자 :{}로그인", Thread.currentThread().getName());
         return ResponseEntity.ok("✅ 관리자 전용 API 접근 성공");
     }
     // 관리자 인기 레시피 3개 조회
@@ -741,7 +743,7 @@ public class AdminController {
     @GetMapping("/stats/recipes/categories")
     public ResponseEntity<List<RecipeStatDTO>> getCategoryStats(
             @RequestParam(required = false) String category) {
-        System.out.println("카테고리 파라미터: " + category);
+        log.debug("카테고리 파라미터: {}", category);
 
         if (category != null && !category.equals("전체")) {
             return ResponseEntity.ok(recipeService.getMonthlyCategoryStatsByName(category));

@@ -3,10 +3,12 @@ package com.example.cns.chat;
 import com.example.cns.User.UserEntity;
 import com.example.cns.notification.FCMService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ChatWebSocketController {
@@ -18,7 +20,7 @@ public class ChatWebSocketController {
 
     @MessageMapping("/chat.send") // 클라이언트에서 "/app/chat.send" 로 보냄
     public void sendMessage(ChatMessage message) {
-        System.out.println("📩 메시지 수신됨: " + message.getRoomKey() + " / " + message.getMessage());
+        log.debug("메시지 수신됨: {} / {}", message.getRoomKey(), message.getMessage());
         chatMessageService.save(message); // DB 저장
         messagingTemplate.convertAndSend(
                 "/topic/chatroom/" + message.getRoomKey(),

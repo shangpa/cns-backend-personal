@@ -5,12 +5,14 @@ import com.example.cns.User.UserService;
 import com.example.cns.jwt.JWTUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -22,18 +24,18 @@ public class AuthController {
     @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) {
         String idToken = request.get("idToken");
-        System.out.println("🔍 클라이언트에서 받은 ID 토큰: " + idToken);
+        log.debug("클라이언트에서 받은 ID 토큰: {}", idToken);
 
         GoogleIdToken.Payload payload = GoogleTokenVerifierUtil.verify(idToken);
 
         if (payload == null) {
-            System.out.println("❌ ID Token 검증 실패 - payload null");
+            log.warn("ID Token 검증 실패 - payload null");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google ID Token");
         }
 
         String email = payload.getEmail();
         String name = (String) payload.get("name");
-        System.out.println("✅ ID Token payload 검증 성공 - email: " + email + ", name: " + name);
+        log.debug("ID Token payload 검증 성공 - email: {}, name: {}", email, name);
 
         UserEntity user = userService.findOrCreateGoogleUser(email, name);
         String token = jwtUtil.createJwt(user.getUsername(), user.getRole(), 1000L * 60 * 60 * 10);

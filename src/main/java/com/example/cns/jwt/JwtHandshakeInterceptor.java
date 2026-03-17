@@ -1,5 +1,6 @@
 package com.example.cns.jwt;
 import com.example.cns.User.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
@@ -7,6 +8,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
 
+@Slf4j
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     private final JWTUtil jwtUtil;
@@ -20,26 +22,26 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
-        System.out.println("🛰️ beforeHandshake 실행됨");
+        log.debug("[Interceptor] beforeHandshake 실행됨");
 
         // 쿼리 파라미터에서 토큰 추출
         String query = request.getURI().getQuery(); // 예: token=eyJ...
-        System.out.println("🛰️ [Interceptor] query: " + query);
+        log.debug("[Interceptor] query: {}", query);
 
         if (query != null && query.startsWith("token=")) {
             String jwtToken = query.substring(6); // token= 이후부터 잘라냄
-            System.out.println("🔐 [Interceptor] 쿼리로부터 토큰 추출: " + jwtToken);
+            log.debug("[Interceptor] 쿼리로부터 토큰 추출");
 
             if (!jwtUtil.isExpired(jwtToken)) {
                 String username = jwtUtil.getUsername(jwtToken);
-                System.out.println("✅ [Interceptor] 토큰 유효, 사용자: " + username);
+                log.debug("[Interceptor] 토큰 유효, 사용자: {}", username);
                 attributes.put("username", username);
                 return true;
             } else {
-                System.out.println("❌ [Interceptor] 토큰 만료");
+                log.warn("[Interceptor] 토큰 만료");
             }
         } else {
-            System.out.println("❌ [Interceptor] 토큰 없음 (query)");
+            log.warn("[Interceptor] 토큰 없음 (query)");
         }
 
         return false;

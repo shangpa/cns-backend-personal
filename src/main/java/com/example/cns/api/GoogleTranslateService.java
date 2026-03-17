@@ -1,5 +1,6 @@
 package com.example.cns.api;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class GoogleTranslateService {
 
@@ -88,7 +90,7 @@ public class GoogleTranslateService {
             for (int i = 0; i < koreanList.size(); i++) {
                 result.put(koreanList.get(i), translations.getJSONObject(i).getString("translatedText"));
             }
-            System.out.println("🗣 [GoogleTranslateService] 번역 결과 (" + koreanList.size() + "개): OK");
+            log.debug("[GoogleTranslateService] 번역 결과 ({}개): OK", koreanList.size());
             return result;
         } else {
             throw new RuntimeException("Google 번역 실패: " + response.getBody());

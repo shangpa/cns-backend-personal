@@ -3,11 +3,13 @@ package com.example.cns.recipe.cashe;
 import com.example.cns.ingredient.IngredientMasterRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import com.example.cns.ingredient.IngredientMaster;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RecipeIngredientCacheInitializer {
@@ -23,7 +25,7 @@ public class RecipeIngredientCacheInitializer {
                 .toList();
 
         ingredientNameCache.initialize(allIngredientNames);
-        System.out.println("✅ 재료 이름 캐시 초기화 완료: 총 " + allIngredientNames.size() + "개");
+        log.debug("재료 이름 캐시 초기화 완료: 총 {}개", allIngredientNames.size());
     }
 }
 
