@@ -1,23 +1,30 @@
 package com.example.cns.common.exception;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class GlobalExceptionHandlerTest {
 
     private MockMvc mockMvc;
+
+    static class TestBody {
+        @NotBlank(message = "이름은 필수입니다")
+        private String name;
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+    }
 
     @RestController
     static class TestController {
@@ -29,6 +36,9 @@ class GlobalExceptionHandlerTest {
 
         @GetMapping("/test/forbidden")
         public void forbidden() { throw new AccessDeniedException("접근이 거부되었습니다"); }
+
+        @PostMapping("/test/valid")
+        public void validBody(@Valid @RequestBody TestBody body) {}
     }
 
     @BeforeEach
@@ -60,5 +70,16 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get("/test/forbidden").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test
+    void validationFail_returns400WithValidationError() throws Exception {
+        // name 필드 누락 → @NotBlank 위반
+        mockMvc.perform(post("/test/valid")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("이름은 필수입니다")));
     }
 }
