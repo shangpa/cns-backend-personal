@@ -21,7 +21,7 @@ import com.example.cns.mypage.RecommendRecipeRepository;
 import com.example.cns.point.PointService;
 import com.example.cns.recipe.RecipeRepository;
 import com.example.cns.recipe.RecipeSearchResponseDTO;
-import com.example.cns.recipe.RecipeService;
+import com.example.cns.recipe.RecipeStatService;
 import com.example.cns.report.ReportService;
 import com.example.cns.review.Recipe.ReviewRepository;
 import com.example.cns.review.Recipe.ReviewService;
@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     private final JoinService joinService;
-    private final RecipeService recipeService;
+    private final RecipeStatService recipeStatService;
     private final AdminRecipeService adminRecipeService;
     private final TradePostService tradePostService;
     private final BoardService boardService;
@@ -100,7 +100,7 @@ public class AdminController {
     //최근 4개월 동안
     @GetMapping("/monthly-stats")
     public ResponseEntity<List<RecipeMonthlyStatsDTO>> getMonthlyStats() {
-        return ResponseEntity.ok(recipeService.getRecentFourMonthsStats());
+        return ResponseEntity.ok(recipeStatService.getRecentFourMonthsStats());
     }
     
     // 관리자 인기 거래글 3개 조회
@@ -166,7 +166,7 @@ public class AdminController {
                 .withDayOfMonth(1)
                 .withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        return ResponseEntity.ok(recipeService.countRecipeMonthly(startDate));
+        return ResponseEntity.ok(recipeStatService.countRecipeMonthly(startDate));
     }
 
     //최근 4개월 레시피 조회수 통계
@@ -177,7 +177,7 @@ public class AdminController {
                 .withDayOfMonth(1)
                 .withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        return ResponseEntity.ok(recipeService.sumRecipeViewsMonthly(startDate));
+        return ResponseEntity.ok(recipeStatService.sumRecipeViewsMonthly(startDate));
     }
 
     // 최근 4개월 전체 거래글 통계
@@ -652,7 +652,7 @@ public class AdminController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
     ) {
-        List<RecipeStatDTO> stats = recipeService.getRecipeStats(type, start, end, year, month);
+        List<RecipeStatDTO> stats = recipeStatService.getRecipeStats(type, start, end, year, month);
         return ResponseEntity.ok(stats);
     }
     /**
@@ -747,9 +747,9 @@ public class AdminController {
         log.debug("카테고리 파라미터: {}", category);
 
         if (category != null && !category.equals("전체")) {
-            return ResponseEntity.ok(recipeService.getMonthlyCategoryStatsByName(category));
+            return ResponseEntity.ok(recipeStatService.getMonthlyCategoryStatsByName(category));
         } else {
-            return ResponseEntity.ok(recipeService.getCategoryStats());
+            return ResponseEntity.ok(recipeStatService.getCategoryStats());
         }
     }
 
