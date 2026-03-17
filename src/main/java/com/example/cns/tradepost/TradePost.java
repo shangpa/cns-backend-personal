@@ -18,9 +18,6 @@ import java.util.List;
 @Builder
 public class TradePost {
 
-    public static final int STATUS_ONGOING = 0; //거래중
-    public static final int STATUS_COMPLETED = 1; //거래완료
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tradePostId;
@@ -54,8 +51,9 @@ public class TradePost {
 
     private String location;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int status = STATUS_ONGOING;  // 기본값 0, 거래중
+    private TradeStatus status = TradeStatus.ONGOING;  // 기본값, 거래중
 
     @Column(name = "view_count", nullable = false)
     private int viewCount = 0;
@@ -103,7 +101,7 @@ public class TradePost {
     }
 
     public boolean isUpProhibited() {
-        return this.status == STATUS_COMPLETED; // 거래완료면 업 불가
+        return this.status == TradeStatus.COMPLETED; // 거래완료면 업 불가
     }
 
     public void markUpped(java.time.LocalDateTime now) {

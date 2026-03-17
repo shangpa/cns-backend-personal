@@ -2,6 +2,7 @@ package com.example.cns.tradepost;
 
 import com.example.cns.User.UserEntity;
 import com.example.cns.admin.dto.UserTradePostSimpleDTO;
+import com.example.cns.tradepost.TradeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -71,11 +72,11 @@ public interface TradePostRepository extends JpaRepository<TradePost, Long> {
     @Query("SELECT t FROM TradePost t ORDER BY t.createdAt DESC")
     List<TradePost> findAllByOrderByCreatedAtDesc();
 
-    List<TradePost> findByBuyerAndStatus(UserEntity buyer, int status);
+    List<TradePost> findByBuyerAndStatus(UserEntity buyer, TradeStatus status);
 
     List<TradePost> findByUser_Username(String username);
 
-    List<TradePost> findByUser_UsernameAndStatus(String username, int status);
+    List<TradePost> findByUser_UsernameAndStatus(String username, TradeStatus status);
 
     // 전체 거래글 월별 수
     @Query("""
@@ -101,7 +102,7 @@ public interface TradePostRepository extends JpaRepository<TradePost, Long> {
 
     Page<TradePost> findAll(Pageable pageable);
 
-    Page<TradePost> findByStatus(int status, Pageable pageable);
+    Page<TradePost> findByStatus(TradeStatus status, Pageable pageable);
 
     @Query("SELECT new com.example.cns.admin.dto.UserTradePostSimpleDTO(" +
             "t.tradePostId, t.title, " +
@@ -123,7 +124,7 @@ public interface TradePostRepository extends JpaRepository<TradePost, Long> {
           AND (:keyword IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
     """)
     Page<TradePost> findByStatusAndTitleKeyword(
-            @Param("status") Integer status,
+            @Param("status") TradeStatus status,
             @Param("keyword") String keyword,
             Pageable pageable
     );
@@ -162,7 +163,7 @@ public interface TradePostRepository extends JpaRepository<TradePost, Long> {
             @Param("distanceKm") Double distanceKm,
             @Param("categories") List<String> categories,
             @Param("categoriesEmpty") boolean categoriesEmpty,
-            @Param("status") Integer status
+            @Param("status") TradeStatus status
     );
 
 }

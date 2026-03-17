@@ -12,7 +12,7 @@ public class TradePostSimpleResponseDTO {
     private String firstImageUrl; // 이미지 여러개 중 첫 번째
     private String createdAt;     // 작성 날짜
     private int price;
-    private int status;           // 0: 거래중, 1: 거래완료
+    private TradeStatus status;   // ONGOING: 거래중, COMPLETED: 거래완료
 
     public static TradePostSimpleResponseDTO fromEntity(TradePost tradePost) {
         return TradePostSimpleResponseDTO.builder()

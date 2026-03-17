@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.example.cns.tradepost.TradeStatus;
+
 import java.time.LocalDateTime;
 
 @Getter @Setter
@@ -14,5 +16,5 @@ public class TradePostListResponseDTO {
     private String title;
     private LocalDateTime createdAt;
     private String category;
-    private int status; // 0: 거래중, 1: 거래완료
+    private TradeStatus status; // ONGOING: 거래중, COMPLETED: 거래완료
 }

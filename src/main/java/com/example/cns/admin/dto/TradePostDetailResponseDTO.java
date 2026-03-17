@@ -1,5 +1,6 @@
 package com.example.cns.admin.dto;
 
+import com.example.cns.tradepost.TradeStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,6 @@ public class TradePostDetailResponseDTO {
     private String location;
     private int chatCount;
     private int viewCount;
-    private int status; // 0: 거래중, 1: 거래완료
+    private TradeStatus status; // ONGOING: 거래중, COMPLETED: 거래완료
 
 }

@@ -29,6 +29,7 @@ import com.example.cns.review.TradePost.TpReviewRepository;
 import com.example.cns.tradepost.TradePostRepository;
 import com.example.cns.tradepost.TradePostService;
 import com.example.cns.tradepost.TradePostSimpleResponseDTO;
+import com.example.cns.tradepost.TradeStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -294,8 +295,8 @@ public class AdminController {
     }
 
     /**
-     * [GET] /admin/tradeposts?page=0&size=10&status=0&sortBy=createdAt
-     * 전체 거래글 조회 (status: 0=거래중, 1=거래완료, 생략 시 전체)
+     * [GET] /admin/tradeposts?page=0&size=10&status=ONGOING&sortBy=createdAt
+     * 전체 거래글 조회 (status: ONGOING=거래중, COMPLETED=거래완료, 생략 시 전체)
      * 정렬 기준: createdAt, category 등 (기본값: createdAt 내림차순)
      * 응답: id, username, title, createdAt, category, status 포함
      */
@@ -303,9 +304,9 @@ public class AdminController {
     public Page<TradePostListResponseDTO> getTradePostList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) TradeStatus status,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String keyword // 🔍 추가
+            @RequestParam(required = false) String keyword
     ) {
         return tradePostService.getTradePosts(page, size, status, sortBy, keyword);
     }
