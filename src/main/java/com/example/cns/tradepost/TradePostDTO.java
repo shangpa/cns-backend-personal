@@ -1,5 +1,6 @@
 package com.example.cns.tradepost;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,11 +13,14 @@ import java.time.LocalDate;
 public class TradePostDTO {
     private Long tradePostId;       // 거래글 ID
     private String writer;          // 작성자 username (출력용)
+    @NotBlank(message = "카테고리는 필수입니다")
     private String category;        // 카테고리
+    @NotBlank(message = "제목은 필수입니다")
     private String title;           // 제목
     private int quantity;           // 수량
     private int price;              // 거래 가격
     private LocalDate purchaseDate; // 구매 날짜
+    @NotBlank(message = "설명은 필수입니다")
     private String description;     // 설명
     private String location;        // 거래 희망 장소 (추후 사용)
     private String imageUrls;       // 이미지 URL 목록 (JSON 문자열)

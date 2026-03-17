@@ -59,11 +59,13 @@ public class RecipeService {
 
     private final ThumbnailAsyncService thumbnailAsyncService;
     // 전체 레시피 조회
+    @Transactional(readOnly = true)
     public List<Recipe> getAllRecipes() {
         return recipeRepository.findAll();
     }
 
     // 공개된 레시피만 정렬해서 가져오기 (비로그인 가드 포함)
+    @Transactional(readOnly = true)
     public List<RecipeSearchResponseDTO> getAllPublicRecipes(String sort) {
         List<Recipe> recipes;
 
@@ -238,6 +240,7 @@ public class RecipeService {
         }).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeSearchResponseDTO> searchRecipesByTitle(String title) {
         List<Recipe> recipes = (title == null || title.trim().isEmpty())
                 ? recipeRepository.findByIsPublicTrueAndIsDraftFalse()
@@ -246,6 +249,7 @@ public class RecipeService {
     }
 
     //관리자 - 카테고리별 통계
+    @Transactional(readOnly = true)
     public List<RecipeStatDTO> getCategoryStats() {
         List<Object[]> raw = recipeRepository.countByCategory();
 
@@ -264,6 +268,7 @@ public class RecipeService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeStatDTO> getMonthlyCategoryStatsByName(String category) {
         try {
             RecipeCategory enumCategory = RecipeCategory.valueOf(category);
@@ -276,6 +281,7 @@ public class RecipeService {
     }
 
     // 메인 - 냉장고 재료 추천 레시피(제목 키워드)
+    @Transactional(readOnly = true)
     public List<RecipeSearchResponseDTO> getRecommendedRecipesByTitleKeywords(List<String> keywords) {
         if (keywords == null || keywords.isEmpty()) {
             return Collections.emptyList();
@@ -295,6 +301,7 @@ public class RecipeService {
     }
 
     // 메인 - 냉장고 재료 추천 레시피 그룹
+    @Transactional(readOnly = true)
     public List<IngredientRecipeGroup> getGroupedRecommendedRecipesByTitle(List<String> keywords) {
         List<Recipe> allRecipes = recipeRepository.findByIsPublicTrue();
 
@@ -317,6 +324,7 @@ public class RecipeService {
 
     // 예상 사용 재료 (NPE 가드)
     // 예상 사용 재료 (냉장고 매칭)
+    @Transactional(readOnly = true)
     public List<ExpectedIngredientDTO> getExpectedIngredients(Long recipeId, UserEntity user) {
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new RuntimeException("레시피를 찾을 수 없습니다."));
@@ -360,6 +368,7 @@ public class RecipeService {
 
 
     // 대시보드/통계
+    @Transactional(readOnly = true)
     public List<RecipeMonthlyStatsDTO> getRecentFourMonthsStats() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime fourMonthsAgo = now.minusMonths(3)
@@ -367,6 +376,7 @@ public class RecipeService {
         return recipeRepository.findRecentRecipeCounts(fourMonthsAgo);
     }
 
+    @Transactional(readOnly = true)
     public List<BoardMonthlyStatsDTO> countRecipeMonthly(LocalDateTime startDate) {
         List<Object[]> raw = recipeRepository.countRecipeMonthlyRaw(startDate);
         return raw.stream()
@@ -374,6 +384,7 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<BoardMonthlyStatsDTO> sumRecipeViewsMonthly(LocalDateTime startDate) {
         List<Object[]> raw = recipeRepository.sumRecipeViewsMonthlyRaw(startDate);
         return raw.stream()
@@ -381,6 +392,7 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeStatDTO> getRecipeStats(StatType type, LocalDate startDate, LocalDate endDate, Integer year, Integer month) {
         if (type == StatType.YEARLY && year != null) {
             return recipeRepository.countByYear(year).stream()
@@ -494,6 +506,7 @@ public class RecipeService {
         return RecipeDTO.fromEntity(recipe);
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipesByTitlesContaining(List<String> keywords) {
         // 공개 레시피만 가져온 뒤 제목 포함 여부로 필터
         List<Recipe> allPublic = recipeRepository.findByIsPublicTrue();

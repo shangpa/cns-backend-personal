@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class TradePostController {
     // 거래글 생성
     @PostMapping
     public ResponseEntity<TradePostDTO> createTradePost(
-            @RequestBody TradePostDTO dto,
+            @Valid @RequestBody TradePostDTO dto,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         TradePost post = tradePostService.create(dto, userDetails.getUsername());
@@ -209,7 +210,7 @@ public class TradePostController {
     @GetMapping("/user/{username}/status/{status}")
     public ResponseEntity<List<TradePostSimpleResponseDTO>> getPostsByUsernameAndStatus(
             @PathVariable String username,
-            @PathVariable int status
+            @PathVariable TradeStatus status
     ) {
         return ResponseEntity.ok(tradePostService.getPostsByUsernameAndStatus(username, status));
     }

@@ -47,7 +47,7 @@ public class TradePostService {
         }
         TradePost tradePost = dto.toEntity();
         tradePost.setUser(user);
-        tradePost.setStatus(TradePost.STATUS_ONGOING);
+        tradePost.setStatus(TradeStatus.ONGOING);
 
         // location: "lat,lng" 문자열에서 위경도 추출 (선택)
         String location = dto.getLocation();
@@ -65,6 +65,7 @@ public class TradePostService {
         return tradePostRepository.save(tradePost);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public TradePostDTO getTradePostById(Long id, String username) {
         TradePost tradePost = tradePostRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 거래글이 존재하지 않습니다. ID=" + id));
@@ -83,6 +84,7 @@ public class TradePostService {
         return TradePostDTO.fromEntity(tradePost);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostSimpleResponseDTO> getMyTradePosts(String username) {
         UserEntity user = userRepository.findByUsername(username);
         if (user == null) {
@@ -94,18 +96,21 @@ public class TradePostService {
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostDTO> getAllTradePosts() {
         return tradePostRepository.findAll().stream()
                 .map(TradePostDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostDTO> getTradePostsByCategory(String category) {
         return tradePostRepository.findByCategory(category).stream()
                 .map(TradePostDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostDTO> searchTradePosts(String keyword) {
         List<TradePost> posts = tradePostRepository
                 .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword);
@@ -123,6 +128,7 @@ public class TradePostService {
      * @param categories 카테고리 목록 - null/빈이면 적용 안 함
      * @param sort       정렬: LATEST(기본), UPDATED, DISTANCE, PRICE, PURCHASE_DATE
      */
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostDTO> getNearbyFlexible(
             String username, Double distanceKm, List<String> categories, String sort
     ) {
@@ -137,7 +143,7 @@ public class TradePostService {
         List<String> catsParam = categoriesEmpty ? List.of("_ALL_") : categories;
 
         List<TradePost> posts = tradePostRepository.findNearbyFlexible(
-                lat, lng, distanceKm, catsParam, categoriesEmpty, TradePost.STATUS_ONGOING /* 진행중만; 전체면 null */
+                lat, lng, distanceKm, catsParam, categoriesEmpty, TradeStatus.ONGOING /* 진행중만; 전체면 null */
         );
 
         class P { TradePost p; Double d; P(TradePost p, Double d){ this.p=p; this.d=d; } }
@@ -174,14 +180,17 @@ public class TradePostService {
     /* --------------------------- 위임(레거시 시그니처 대응) --------------------------- */
 
     // (선택) 여전히 호출되는 곳이 있으면 위임만 남겨둬도 됨
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostDTO> getNearbyTradePosts(String username, Double distanceKm) {
         return getNearbyFlexible(username, distanceKm, null, "LATEST");
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostDTO> getNearbyByCategory(String username, double distanceKm, String category) {
         return getNearbyFlexible(username, distanceKm, Collections.singletonList(category), "LATEST");
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostDTO> getNearbyPostsByMultipleCategories(UserEntity user, double distanceKm, List<String> categories) {
         String username = (user != null) ? user.getUsername() : null;
         return getNearbyFlexible(username, distanceKm, categories, "LATEST");
@@ -189,6 +198,7 @@ public class TradePostService {
 
     /* --------------------------- 인기/조회수/완료 처리 --------------------------- */
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostSimpleResponseDTO> getTop3PopularTradePosts() {
         Pageable pageable = PageRequest.of(0, 3);
         List<TradePost> topPosts = tradePostRepository.findTop3ByOrderByViewCountDesc(pageable);
@@ -209,7 +219,7 @@ public class TradePostService {
         TradePost post = tradePostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("거래글이 존재하지 않습니다."));
 
-        if (post.getStatus() == TradePost.STATUS_COMPLETED) {
+        if (post.getStatus() == TradeStatus.COMPLETED) {
             throw new IllegalStateException("이미 거래가 완료된 게시글입니다.");
         }
 
@@ -225,15 +235,16 @@ public class TradePostService {
         pointService.addPoint(seller, PointActionType.TRADE_COMPLETE, price, "거래 수익 - " + post.getTitle());
 
         // 3) 상태 변경 / 4) 구매자 기록
-        post.setStatus(TradePost.STATUS_COMPLETED);
+        post.setStatus(TradeStatus.COMPLETED);
         post.setBuyer(buyer);
 
         return tradePostRepository.save(post);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostSimpleResponseDTO> getMyPurchasedPosts(String username) {
         UserEntity user = userRepository.findByUsername(username);
-        List<TradePost> posts = tradePostRepository.findByBuyerAndStatus(user, TradePost.STATUS_COMPLETED);
+        List<TradePost> posts = tradePostRepository.findByBuyerAndStatus(user, TradeStatus.COMPLETED);
         return posts.stream()
                 .map(TradePostSimpleResponseDTO::fromEntity)
                 .collect(Collectors.toList());
@@ -241,18 +252,21 @@ public class TradePostService {
 
     /* --------------------------- 사용자별/집계/관리자 --------------------------- */
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<TradePostSimpleResponseDTO> getPostsByUsername(String username) {
         return tradePostRepository.findByUser_Username(username).stream()
                 .map(TradePostSimpleResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public List<TradePostSimpleResponseDTO> getPostsByUsernameAndStatus(String username, int status) {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<TradePostSimpleResponseDTO> getPostsByUsernameAndStatus(String username, TradeStatus status) {
         return tradePostRepository.findByUser_UsernameAndStatus(username, status).stream()
                 .map(TradePostSimpleResponseDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardMonthlyStatsDTO> countTradePostMonthly(LocalDateTime startDate) {
         List<Object[]> raw = tradePostRepository.countTradePostMonthlyRaw(startDate);
         return raw.stream()
@@ -260,6 +274,7 @@ public class TradePostService {
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardMonthlyStatsDTO> countFreeTradePostMonthly(LocalDateTime startDate) {
         List<Object[]> raw = tradePostRepository.countFreeTradePostMonthlyRaw(startDate);
         return raw.stream()
@@ -267,7 +282,8 @@ public class TradePostService {
                 .collect(Collectors.toList());
     }
 
-    public Page<TradePostListResponseDTO> getTradePosts(int page, int size, Integer status, String sortBy, String keyword) {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<TradePostListResponseDTO> getTradePosts(int page, int size, TradeStatus status, String sortBy, String keyword) {
         if (sortBy == null || sortBy.isEmpty()) sortBy = "updatedAt";
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
 
@@ -290,6 +306,7 @@ public class TradePostService {
         ));
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public TradePostDetailResponseDTO getTradePostDetail(Long postId) {
         TradePost tradePost = tradePostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 거래글이 존재하지 않습니다."));
@@ -352,6 +369,7 @@ public class TradePostService {
         );
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public UserProfileResponseDTO getUserProfile(UserEntity user) {
         int reviewCount = tpReviewRepository.countByUser(user);
         Double avgRating = tpReviewRepository.avgRatingByUser((long) user.getId());

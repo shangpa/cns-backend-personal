@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class BoardController {
 
     //커뮤니티 게시글 작성
     @PostMapping
-    public ResponseEntity<BoardResponseDTO> createBoard(@RequestBody BoardRequestDTO dto,
+    public ResponseEntity<BoardResponseDTO> createBoard(@Valid @RequestBody BoardRequestDTO dto,
                                                         @AuthenticationPrincipal UserDetails userDetails) {
         log.debug("userDetails: {}", userDetails);
         BoardResponseDTO response = boardService.create(dto, userDetails.getUsername());

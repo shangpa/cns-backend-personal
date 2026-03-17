@@ -43,6 +43,7 @@ public class BoardService {
         );
     }
     // 인기 Top 10
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardDetailResponseDTO> getPopularBoards() {
         List<BoardType> types = List.of(BoardType.COOKING, BoardType.FREE);
         Pageable pageable = PageRequest.of(0, 10);
@@ -63,6 +64,7 @@ public class BoardService {
     }
 
     //특정 id 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public BoardDetailResponseDTO getBoardDetail(Long id, String username) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
@@ -83,6 +85,7 @@ public class BoardService {
     }
 
     // 인기게시판: 타입 상관없이 좋아요순 TOP N
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardDetailResponseDTO> getPopularBoards(int limit, String username) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "likeCount"));
         List<Board> boards = boardRepository.findAll(pageable).getContent();
@@ -92,6 +95,7 @@ public class BoardService {
                 .toList();
     }
     // 타입별 최신순 TOP N
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardDetailResponseDTO> getBoardsByTypeAndSort(BoardType type, String sort, int limit, String username) {
         Sort sorting = sort.equals("like") ?
                 Sort.by(Sort.Direction.DESC, "likeCount") :
@@ -123,6 +127,7 @@ public class BoardService {
         );
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardDetailResponseDTO> getBoardsByTypePaged(BoardType type, String sort, int page, int size, String username) {
         Sort sorting = switch (sort) {
             case "like" -> Sort.by(Sort.Direction.DESC, "likeCount");
@@ -135,6 +140,7 @@ public class BoardService {
     }
     
     //마이페이지 - 작성한 게시글 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardDetailResponseDTO> getBoardsByUser(String username) {
         UserEntity user = userRepository.findByUsername(username);
         List<Board> boards = boardRepository.findByWriter(user);
@@ -163,6 +169,7 @@ public class BoardService {
     }
 
     //관리자용 인기순3개
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardDetailResponseDTO> getTop3PopularBoardsForAdmin() {
         Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "likeCount"));
         List<Board> boards = boardRepository.findAll(pageable).getContent();
@@ -180,6 +187,7 @@ public class BoardService {
                         board.getCommentCount()
                 )).toList();
     }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<BoardMonthlyStatsDTO> countBoardMonthly(LocalDateTime startDate) {
         List<Object[]> rawData = boardRepository.countBoardMonthlyRaw(startDate);
         return rawData.stream()
@@ -189,10 +197,12 @@ public class BoardService {
                 ))
                 .collect(Collectors.toList());
     }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Page<BoardAdminListResponseDTO> getBoards(Pageable pageable) {
         return boardRepository.findAllBoardsForAdmin(pageable);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public BoardDetailAdminDTO getBoardDetail(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
@@ -261,16 +271,19 @@ public class BoardService {
                 reason
         );
     }
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Page<CommentAdminResponseDTO> getCommentsForAdmin(Pageable pageable) {
         return boardCommentRepository.findAll(pageable)
                 .map(CommentAdminResponseDTO::from);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Page<CommentAdminResponseDTO> searchCommentsByContent(String keyword, Pageable pageable) {
         return boardCommentRepository.findByContentContaining(keyword, pageable)
                 .map(CommentAdminResponseDTO::from);
     }
     // BoardService.java
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Long getBoardIdByCommentId(Long commentId) {
         BoardComment comment = boardCommentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));

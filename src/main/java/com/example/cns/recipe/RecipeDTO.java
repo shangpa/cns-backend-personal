@@ -2,6 +2,8 @@ package com.example.cns.recipe;
 
 import com.example.cns.recipeingredient.RecipeIngredientDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,13 +15,16 @@ import java.util.List;
 @Builder
 public class RecipeDTO {
     private Long recipeId;
+    @NotBlank(message = "제목은 필수입니다")
     private String title;
+    @NotNull(message = "카테고리는 필수입니다")
     private String category;                 // RecipeCategory.name()
     private List<RecipeIngredientDTO> ingredients;             // JSON
     private String alternativeIngredients;   // JSON
     private String handlingMethods;          // JSON
     private String cookingSteps;             // JSON
     private String mainImageUrl;
+    @NotNull(message = "난이도는 필수입니다")
     private String difficulty;               // RecipeDifficulty.name()  // "초급","중급","상급"
     private String tags;
 

@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import com.example.cns.search.RecipeSearchService;
@@ -65,7 +66,7 @@ public class RecipeController {
     // 레시피 생성(발행)
     @PostMapping
     public ResponseEntity<RecipeResponseDTO> createRecipe(
-            @RequestBody RecipeDTO recipeDTO,
+            @Valid @RequestBody RecipeDTO recipeDTO,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         Recipe recipe = recipeService.createRecipe(recipeDTO, userDetails.getUsername());
