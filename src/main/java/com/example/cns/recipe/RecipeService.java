@@ -1,9 +1,5 @@
 package com.example.cns.recipe;
 
-import com.example.cns.admin.dto.BoardMonthlyStatsDTO;
-import com.example.cns.admin.dto.RecipeMonthlyStatsDTO;
-import com.example.cns.admin.dto.RecipeStatDTO;
-import com.example.cns.admin.enums.StatType;
 import com.example.cns.admin.log.AdminLogService;
 import com.example.cns.api.OpenAiService;
 import com.example.cns.api.ThumbnailAsyncService;
@@ -31,8 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Type;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -248,38 +242,6 @@ public class RecipeService {
         return toSearchDtoList(recipes);  // 공통 매퍼 재사용
     }
 
-    //관리자 - 카테고리별 통계
-    @Transactional(readOnly = true)
-    public List<RecipeStatDTO> getCategoryStats() {
-        List<Object[]> raw = recipeRepository.countByCategory();
-
-        Map<RecipeCategory, Long> map = raw.stream()
-                .collect(Collectors.toMap(
-                        obj -> (RecipeCategory) obj[0],
-                        obj -> (Long) obj[1]
-                ));
-
-        List<RecipeStatDTO> result = new ArrayList<>();
-        for (RecipeCategory category : RecipeCategory.values()) {
-            long count = map.getOrDefault(category, 0L);
-            result.add(new RecipeStatDTO(category.name(), count));
-        }
-
-        return result;
-    }
-
-    @Transactional(readOnly = true)
-    public List<RecipeStatDTO> getMonthlyCategoryStatsByName(String category) {
-        try {
-            RecipeCategory enumCategory = RecipeCategory.valueOf(category);
-            return recipeRepository.countMonthlyBySpecificCategory(enumCategory).stream()
-                    .map(obj -> new RecipeStatDTO(obj[0].toString(), (Long) obj[1]))
-                    .collect(Collectors.toList());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("유효하지 않은 카테고리입니다: " + category);
-        }
-    }
-
     // 메인 - 냉장고 재료 추천 레시피(제목 키워드)
     @Transactional(readOnly = true)
     public List<RecipeSearchResponseDTO> getRecommendedRecipesByTitleKeywords(List<String> keywords) {
@@ -367,52 +329,6 @@ public class RecipeService {
     }
 
 
-    // 대시보드/통계
-    @Transactional(readOnly = true)
-    public List<RecipeMonthlyStatsDTO> getRecentFourMonthsStats() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fourMonthsAgo = now.minusMonths(3)
-                .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        return recipeRepository.findRecentRecipeCounts(fourMonthsAgo);
-    }
-
-    @Transactional(readOnly = true)
-    public List<BoardMonthlyStatsDTO> countRecipeMonthly(LocalDateTime startDate) {
-        List<Object[]> raw = recipeRepository.countRecipeMonthlyRaw(startDate);
-        return raw.stream()
-                .map(row -> new BoardMonthlyStatsDTO((String) row[0], (Long) row[1]))
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<BoardMonthlyStatsDTO> sumRecipeViewsMonthly(LocalDateTime startDate) {
-        List<Object[]> raw = recipeRepository.sumRecipeViewsMonthlyRaw(startDate);
-        return raw.stream()
-                .map(row -> new BoardMonthlyStatsDTO((String) row[0], (Long) row[1]))
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<RecipeStatDTO> getRecipeStats(StatType type, LocalDate startDate, LocalDate endDate, Integer year, Integer month) {
-        if (type == StatType.YEARLY && year != null) {
-            return recipeRepository.countByYear(year).stream()
-                    .map(obj -> new RecipeStatDTO(obj[0] + "월", (Long) obj[1]))
-                    .collect(Collectors.toList());
-
-        } else if (type == StatType.MONTHLY && year != null && month != null) {
-            return recipeRepository.countByMonth(year, month).stream()
-                    .map(obj -> new RecipeStatDTO(obj[0] + "일", (Long) obj[1]))
-                    .collect(Collectors.toList());
-
-        } else if (type == StatType.DAILY && startDate != null && endDate != null) {
-            return recipeRepository.countByDateRange(startDate.atStartOfDay(), endDate.atTime(23, 59, 59)).stream()
-                    .map(obj -> new RecipeStatDTO(obj[0].toString(), (Long) obj[1]))
-                    .collect(Collectors.toList());
-        }
-
-        throw new IllegalArgumentException("유효하지 않은 파라미터입니다.");
-    }
-
     // 관리자 삭제
     @Transactional
     public void deleteRecipeByAdmin(Long recipeId, String adminUsername, String reason) {
@@ -498,14 +414,6 @@ public class RecipeService {
         }).toList();
     }
 
-    // 내 초안 단건 조회 (컨트롤러에서 사용)
-    @Transactional(readOnly = true)
-    public RecipeDTO getMyDraftById(Long recipeId, UserEntity user) {
-        Recipe recipe = recipeRepository.findDraftWithIngredients(recipeId, user.getId())
-                .orElseThrow(() -> new RuntimeException("임시저장 레시피를 찾을 수 없습니다."));
-        return RecipeDTO.fromEntity(recipe);
-    }
-
     @Transactional(readOnly = true)
     public List<RecipeDTO> findRecipesByTitlesContaining(List<String> keywords) {
         // 공개 레시피만 가져온 뒤 제목 포함 여부로 필터
@@ -523,47 +431,4 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
-    // 임시저장
-    @Transactional
-    public Long createDraftTransactional(RecipeDTO dto, UserEntity user) {
-        Recipe entity = dto.toEntityDraftSafe();
-        if (entity.getRecipeType() == null) entity.setRecipeType(RecipeType.IMAGE);
-        entity.setUser(user);
-        entity.setDraft(true);
-        entity.setPublic(false);
-        entity.setCreatedAt(LocalDateTime.now());
-
-        recipeRepository.save(entity); // 부모 영속화
-
-        if (dto.getIngredients() != null && !dto.getIngredients().isEmpty()) {
-            List<RecipeIngredient> ingList = dto.getIngredients().stream()
-                    .map(riDto -> {
-                        if (riDto.getId() == null && (riDto.getName() == null || riDto.getName().isBlank())) return null;
-
-                        var master = (riDto.getId() != null)
-                                ? ingredientMasterRepository.findById(riDto.getId()).orElse(null)
-                                : ingredientMasterRepository.findByNameKoIgnoreCase(riDto.getName()).orElse(null);
-                        if (master == null) return null;
-
-                        Double qty = riDto.getAmount() != null ? riDto.getAmount() : 1.0; // 기본값 1.0
-                        return RecipeIngredient.builder()
-                                .ingredient(master)
-                                .quantity(qty)
-                                .build();
-                    })
-                    .filter(Objects::nonNull)
-                    .toList();
-
-            if (!ingList.isEmpty()) {
-                entity.getIngredients().clear();     // orphanRemoval 로 기존 것 제거
-                for (RecipeIngredient ri : ingList) {
-                    ri.setRecipe(entity);            // 🔴 역방향 세팅 필수
-                    entity.getIngredients().add(ri); // 부모 컬렉션에 추가
-                }
-                recipeRepository.save(entity);       // 병합(변경감지로도 됨, 호출해도 무방)
-            }
-        }
-
-        return entity.getRecipeId();
-    }
 }

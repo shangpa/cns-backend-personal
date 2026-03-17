@@ -1,9 +1,6 @@
 package com.example.cns.recipe;
 
 import com.example.cns.dto.CustomUserDetails;
-import com.example.cns.ingredient.IngredientMasterRepository;
-import com.example.cns.recipeingredient.RecipeIngredient;
-import com.example.cns.recipeingredient.RecipeIngredientRepository;
 import com.example.cns.search.SearchKeywordService;
 import com.example.cns.search.SeasonalRecipeDto;
 import lombok.Getter;
@@ -13,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
@@ -30,12 +26,11 @@ import java.util.stream.Collectors;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final RecipeDraftService recipeDraftService;
     private final SearchKeywordService searchKeywordService;
     private final RecipeRepository recipeRepository;
     private final RecipeSearchService recipeSearchService;
-    private final IngredientMasterRepository ingredientMasterRepository;
     private final RecommendService recommendService;
-    private final RecipeIngredientRepository recipeIngredientRepository;
 
     // 레시피 전체 조회
     @GetMapping
@@ -191,7 +186,7 @@ public class RecipeController {
             @PathVariable Long recipeId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        RecipeDTO draft = recipeService.getMyDraftById(recipeId, userDetails.getUserEntity());
+        RecipeDTO draft = recipeDraftService.getMyDraftById(recipeId, userDetails.getUserEntity());
         return ResponseEntity.ok(draft);
     }
 
@@ -201,7 +196,7 @@ public class RecipeController {
             @RequestBody RecipeDTO dto,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        Long id = recipeService.createDraftTransactional(dto, user.getUserEntity());
+        Long id = recipeDraftService.createDraftTransactional(dto, user.getUserEntity());
         return ResponseEntity.ok(new RecipeResponseDTO(true, "임시저장 생성", id));
     }
 
@@ -212,62 +207,7 @@ public class RecipeController {
             @RequestBody RecipeDTO dto,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        Recipe draft = recipeRepository
-                .findByRecipeIdAndUserIdAndIsDraftTrue(id, user.getUserEntity().getId())
-                .orElseThrow(() -> new RuntimeException("임시저장이 없거나 권한 없음."));
-
-        // 제목
-        if (StringUtils.hasText(dto.getTitle())) draft.setTitle(dto.getTitle());
-
-        // 카테고리/난이도/레시피타입: 빈문자 무시
-        if (StringUtils.hasText(dto.getCategory())) {
-            try { draft.setCategory(RecipeCategory.valueOf(dto.getCategory())); }
-            catch (Exception e) { log.warn("Invalid category: {}", dto.getCategory()); }
-        }
-        if (StringUtils.hasText(dto.getDifficulty())) {
-            try { draft.setDifficulty(RecipeDifficulty.valueOf(dto.getDifficulty())); }
-            catch (Exception e) { log.warn("Invalid difficulty: {}", dto.getDifficulty()); }
-        }
-        if (StringUtils.hasText(dto.getRecipeType())) {
-            try { draft.setRecipeType(RecipeType.valueOf(dto.getRecipeType())); }
-            catch (Exception e) { log.warn("Invalid recipeType: {}", dto.getRecipeType()); }
-        }
-
-        // 재료 교체
-        if (dto.getIngredients() != null) {
-            List<RecipeIngredient> ingList = dto.getIngredients().stream()
-                    .filter(riDto -> riDto.getId() != null)
-                    .map(riDto -> RecipeIngredient.builder()
-                            .ingredient(ingredientMasterRepository.findById(riDto.getId())
-                                    .orElseThrow(() -> new IllegalArgumentException("재료 없음: " + riDto.getId())))
-                            .quantity(riDto.getAmount() != null ? riDto.getAmount() : 1.0)
-                            .build())
-                    .toList();
-
-            draft.getIngredients().clear();        // orphanRemoval 로 기존 것 삭제
-            for (RecipeIngredient ri : ingList) {
-                ri.setRecipe(draft);               // 역방향 세팅
-                draft.getIngredients().add(ri);
-            }
-        }
-
-        // 지우기 허용 문자열들: null이면 미변경, ""이면 비우기
-        if (dto.getAlternativeIngredients() != null) draft.setAlternativeIngredients(dto.getAlternativeIngredients());
-        if (dto.getHandlingMethods()        != null) draft.setHandlingMethods(dto.getHandlingMethods());
-        if (dto.getCookingSteps()           != null) draft.setCookingSteps(dto.getCookingSteps());
-        if (dto.getMainImageUrl()           != null) draft.setMainImageUrl(dto.getMainImageUrl());
-        if (dto.getTags()                   != null) draft.setTags(dto.getTags());
-        if (dto.getVideoUrl()               != null) draft.setVideoUrl(dto.getVideoUrl());
-
-        // 숫자형
-        if (dto.getCookingTime() != null) draft.setCookingTime(dto.getCookingTime());
-        if (dto.getServings()    != null) draft.setServings(dto.getServings());
-
-        // 강제 초안 상태 유지
-        draft.setDraft(true);
-        draft.setPublic(false);
-
-        Recipe saved = recipeRepository.save(draft);
+        Recipe saved = recipeDraftService.updateDraft(id, dto, user.getUserEntity().getId());
         return ResponseEntity.ok(RecipeDTO.fromEntity(saved));
     }
 
@@ -277,10 +217,7 @@ public class RecipeController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        Recipe draft = recipeRepository
-                .findByRecipeIdAndUserIdAndIsDraftTrue(id, user.getUserEntity().getId())
-                .orElseThrow(() -> new RuntimeException("임시저장이 없거나 권한 없음."));
-        recipeRepository.delete(draft);
+        recipeDraftService.deleteDraft(id, user.getUserEntity().getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -291,19 +228,7 @@ public class RecipeController {
             @RequestBody PublishRequest req,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        Recipe draft = recipeRepository
-                .findByRecipeIdAndUserIdAndIsDraftTrue(id, user.getUserEntity().getId())
-                .orElseThrow(() -> new RuntimeException("임시저장이 없거나 권한 없음."));
-
-        // 필수 검증(필요 시 추가)
-        if (draft.getTitle() == null || draft.getCategory() == null) {
-            throw new IllegalArgumentException("제목/카테고리는 필수입니다.");
-        }
-
-        draft.setDraft(false); // 발행
-        draft.setPublic(Boolean.TRUE.equals(req.getIsPublic()));
-
-        Recipe saved = recipeRepository.save(draft);
+        Recipe saved = recipeDraftService.publishDraft(id, Boolean.TRUE.equals(req.getIsPublic()), user.getUserEntity().getId());
         return ResponseEntity.ok(RecipeDTO.fromEntity(saved));
     }
 
