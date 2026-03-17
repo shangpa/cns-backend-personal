@@ -1,0 +1,7 @@
+# Copy this file to application-local.properties and fill in your own values.
+# application-local.properties is gitignored and should never be committed.
+DB_URL=jdbc:mysql://localhost:3306/test?serverTimezone=UTC&characterEncoding=UTF-8
+DB_USERNAME=root
+DB_PASSWORD=your_password_here
+JWT_SECRET=your_jwt_secret_here
+GOOGLE_API_KEY=

@@ -41,3 +41,7 @@ out/
 
 ### api key ###
 src/main/resources/api.properties
+
+### Local secrets (never commit) ###
+src/main/resources/application-local.properties
+src/main/resources/gcp-key.json
