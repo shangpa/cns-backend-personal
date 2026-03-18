@@ -5,11 +5,13 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.FileInputStream;
 
+@Slf4j
 @Configuration
 public class FirebaseConfig {
     @PostConstruct
@@ -25,7 +27,7 @@ public class FirebaseConfig {
                 FirebaseApp.initializeApp(options);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Firebase 초기화 실패 (서비스 키 확인 필요): {}", e.getMessage());
         }
     }
 

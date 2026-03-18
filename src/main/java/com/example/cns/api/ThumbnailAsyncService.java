@@ -4,10 +4,12 @@ import com.example.cns.api.OpenAiService;
 import com.example.cns.recipe.Recipe;
 import com.example.cns.recipe.RecipeRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThumbnailAsyncService {
@@ -32,7 +34,7 @@ public class ThumbnailAsyncService {
 
         } catch (Exception e) {
             // 백그라운드에서 터진 에러이므로 로그로 꼭 남겨줍니다.
-            System.err.println("비동기 썸네일 생성 중 에러 발생: " + e.getMessage());
+            log.error("비동기 썸네일 생성 중 에러 발생: {}", e.getMessage());
         }
     }
 }

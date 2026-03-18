@@ -35,7 +35,7 @@ public class FCMService {
             log.debug("FCM 전송 성공");
 
         } catch (FirebaseMessagingException e) {
-            e.printStackTrace();
+            log.warn("FCM 단건 전송 실패: {}", e.getMessage());
         }
     }
     public void sendNotificationToUser(UserEntity user, String title, String content, String category) {

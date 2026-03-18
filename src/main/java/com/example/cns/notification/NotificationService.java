@@ -7,11 +7,13 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -53,7 +55,7 @@ public class NotificationService {
 
             FirebaseMessaging.getInstance().send(message);
         } catch (FirebaseMessagingException e) {
-            e.printStackTrace();
+            log.warn("FCM 전송 실패 (token={}): {}", targetToken, e.getMessage());
         }
     }
 }

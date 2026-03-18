@@ -4,6 +4,8 @@ import com.example.cns.User.UserEntity;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -17,6 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TradePost {
+
+    private static final Logger log = LoggerFactory.getLogger(TradePost.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,7 +82,7 @@ public class TradePost {
             }
             return urls.get(0); // 첫 번째 이미지 반환
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("이미지 URL 파싱 실패 (tradePostId={}): {}", this.tradePostId, e.getMessage());
             return null;
         }
     }
