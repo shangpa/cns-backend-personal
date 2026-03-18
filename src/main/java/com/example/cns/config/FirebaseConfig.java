@@ -33,6 +33,10 @@ public class FirebaseConfig {
 
     @Bean
     public FirebaseMessaging firebaseMessaging() {
+        if (FirebaseApp.getApps().isEmpty()) {
+            log.warn("FirebaseApp이 초기화되지 않아 FCM 기능이 비활성화됩니다.");
+            return null;
+        }
         return FirebaseMessaging.getInstance();
     }
 }

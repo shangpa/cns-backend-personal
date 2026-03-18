@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 uploads/
+logs/
 ### FCM Key ###
 src/main/resources/firebase/serviceAccountKey.json
 

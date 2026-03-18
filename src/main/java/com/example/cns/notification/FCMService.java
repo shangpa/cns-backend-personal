@@ -8,6 +8,7 @@ import com.google.firebase.messaging.Notification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,9 +20,15 @@ public class FCMService {
 
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
-    private final FirebaseMessaging firebaseMessaging;
+
+    @Autowired(required = false)
+    private FirebaseMessaging firebaseMessaging;
 
     public void sendNotification(String targetToken, String title, String body) {
+        if (firebaseMessaging == null) {
+            log.debug("FCM 비활성화 상태 — 알림 전송 생략");
+            return;
+        }
         try {
             Message message = Message.builder()
                     .setToken(targetToken)
@@ -31,7 +38,7 @@ public class FCMService {
                             .build())
                     .build();
 
-            FirebaseMessaging.getInstance().send(message);
+            firebaseMessaging.send(message);
             log.debug("FCM 전송 성공");
 
         } catch (FirebaseMessagingException e) {
@@ -39,6 +46,10 @@ public class FCMService {
         }
     }
     public void sendNotificationToUser(UserEntity user, String title, String content, String category) {
+        if (firebaseMessaging == null) {
+            log.debug("FCM 비활성화 상태 — 알림 전송 생략");
+            return;
+        }
         // 1. 알림 DB 저장
         NotificationEntity notification = new NotificationEntity();
         notification.setUser(user);
@@ -68,6 +79,10 @@ public class FCMService {
 
     //채팅용
     public void sendChatNotification(UserEntity user, String content, String roomKey) {
+        if (firebaseMessaging == null) {
+            log.debug("FCM 비활성화 상태 — 채팅 알림 전송 생략");
+            return;
+        }
         List<DeviceToken> tokens = deviceTokenRepository.findByUser(user);
         for (DeviceToken token : tokens) {
             Message message = Message.builder()
