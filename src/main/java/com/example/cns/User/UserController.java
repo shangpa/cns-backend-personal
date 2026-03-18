@@ -108,7 +108,7 @@ public class UserController {
     }
 
     //id로 이름찾기
-    @GetMapping("/profile-by-{id}/name")
+    @GetMapping("/{id}/name")
     public ResponseEntity<Map> getUsernameById(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("id") Long id
