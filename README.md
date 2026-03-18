@@ -16,7 +16,7 @@
 
 > 레거시(`fridge`, `fridge_history`)·유틸(`search_keyword`, `admin_log`) 테이블 제외, 핵심 도메인 중심으로 표시
 
-![ERD](readme/CNS_erd.png)
+![ERD](readme/CNS_erd.svg)
 
 - **인증**: JWT Stateless 인증 (Spring Security 6)
 - **실시간**: WebSocket (STOMP) 기반 채팅
