@@ -1,0 +1,41 @@
+%%{init: {'er': {'layoutDirection': 'LR'}}}%%
+erDiagram
+    userentity {
+        int id PK
+        varchar username
+        varchar role
+        int point
+        double latitude
+        double longitude
+    }
+    user_follow {
+        bigint id PK
+        int follower_id FK
+        int following_id FK
+    }
+    point_history {
+        bigint id PK
+        int user_id FK
+        int pointChange
+        varchar action
+        datetime createdAt
+    }
+    notification_entity {
+        bigint id PK
+        int user_id FK
+        varchar category
+        varchar content
+        boolean read
+    }
+    device_token {
+        bigint id PK
+        int user_id FK
+        varchar fcmToken
+        varchar platform
+    }
+
+    userentity ||--o{ user_follow : "팔로워"
+    userentity ||--o{ user_follow : "팔로잉"
+    userentity ||--o{ point_history : "적립 이력"
+    userentity ||--o{ notification_entity : "알림 수신"
+    userentity ||--o{ device_token : "FCM 토큰"

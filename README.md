@@ -14,9 +14,22 @@
 
 ## System Architecture & DB Design
 
-> 레거시(`fridge`, `fridge_history`)·유틸(`search_keyword`, `admin_log`) 테이블 제외, 핵심 도메인 중심으로 표시
+> 레거시(`fridge`, `fridge_history`)·유틸(`search_keyword`, `admin_log`) 테이블 제외, 도메인별로 분리하여 표시
 
-![ERD](readme/CNS_erd.svg)
+### 사용자 도메인
+![ERD - 사용자](readme/erd_user.svg)
+
+### 레시피 도메인
+![ERD - 레시피](readme/erd_recipe.svg)
+
+### 팬트리 도메인 (식재료 관리)
+![ERD - 팬트리](readme/erd_pantry.svg)
+
+### 거래 · 채팅 도메인
+![ERD - 거래](readme/erd_trade.svg)
+
+### 커뮤니티 도메인
+![ERD - 커뮤니티](readme/erd_community.svg)
 
 - **인증**: JWT Stateless 인증 (Spring Security 6)
 - **실시간**: WebSocket (STOMP) 기반 채팅

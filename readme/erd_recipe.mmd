@@ -1,0 +1,60 @@
+%%{init: {'er': {'layoutDirection': 'LR'}}}%%
+erDiagram
+    userentity {
+        int id PK
+        varchar username
+    }
+    unit {
+        bigint id PK
+        varchar name
+        varchar kind
+    }
+    ingredient_master {
+        bigint id PK
+        varchar nameKo
+        varchar category
+        bigint default_unit_id FK
+    }
+    recipe {
+        bigint recipeId PK
+        int user_id FK
+        varchar title
+        varchar category
+        boolean isDraft
+        int viewCount
+        int likes
+    }
+    recipe_ingredient {
+        bigint id PK
+        bigint recipe_id FK
+        bigint ingredient_id FK
+        double quantity
+    }
+    like_recipe {
+        bigint id PK
+        int user_id FK
+        bigint recipe_id FK
+    }
+    recommend_recipe {
+        bigint id PK
+        int user_id FK
+        bigint recipe_id FK
+    }
+    review {
+        bigint reviewId PK
+        bigint recipe_id FK
+        int user_id FK
+        int rating
+        varchar content
+    }
+
+    ingredient_master }o--|| unit : "기본 단위"
+    userentity ||--o{ recipe : "작성"
+    userentity ||--o{ like_recipe : "좋아요"
+    userentity ||--o{ recommend_recipe : "추천"
+    userentity ||--o{ review : "작성"
+    recipe ||--o{ recipe_ingredient : "포함"
+    recipe ||--o{ like_recipe : "받음"
+    recipe ||--o{ recommend_recipe : "받음"
+    recipe ||--o{ review : "받음"
+    ingredient_master ||--o{ recipe_ingredient : "사용됨"

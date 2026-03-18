@@ -1,0 +1,48 @@
+%%{init: {'er': {'layoutDirection': 'LR'}}}%%
+erDiagram
+    userentity {
+        int id PK
+        varchar username
+    }
+    board {
+        bigint id PK
+        int writer_id FK
+        varchar content
+        varchar boardType
+        int likeCount
+        int commentCount
+    }
+    board_comment {
+        bigint id PK
+        int user_id FK
+        bigint board_id FK
+        varchar content
+    }
+    board_like {
+        bigint id PK
+        int user_id FK
+        bigint board_id FK
+    }
+    shorts_video {
+        bigint id PK
+        int user_id FK
+        varchar title
+        int viewCount
+        int likeCount
+        int commentCount
+    }
+    short_comment {
+        bigint id PK
+        int user_id FK
+        bigint shorts_video_id FK
+        varchar content
+    }
+
+    userentity ||--o{ board : "작성"
+    userentity ||--o{ board_comment : "댓글"
+    userentity ||--o{ board_like : "좋아요"
+    userentity ||--o{ shorts_video : "업로드"
+    userentity ||--o{ short_comment : "댓글"
+    board ||--o{ board_comment : "포함"
+    board ||--o{ board_like : "받음"
+    shorts_video ||--o{ short_comment : "포함"

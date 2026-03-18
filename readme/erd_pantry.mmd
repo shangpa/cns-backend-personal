@@ -1,0 +1,52 @@
+%%{init: {'er': {'layoutDirection': 'LR'}}}%%
+erDiagram
+    userentity {
+        int id PK
+        varchar username
+    }
+    unit {
+        bigint id PK
+        varchar name
+        varchar kind
+    }
+    ingredient_master {
+        bigint id PK
+        varchar nameKo
+        varchar category
+    }
+    pantry {
+        bigint id PK
+        int user_id FK
+        varchar name
+        boolean isDefault
+        int sortOrder
+    }
+    pantry_stock {
+        bigint id PK
+        bigint pantry_id FK
+        bigint ingredient_id FK
+        bigint unit_id FK
+        decimal quantity
+        varchar storage
+        date expiresAt
+    }
+    pantry_history {
+        bigint id PK
+        bigint pantry_id FK
+        bigint ingredient_id FK
+        bigint unit_id FK
+        bigint stock_id FK
+        decimal changeQty
+        varchar action
+        varchar refType
+        bigint refId
+    }
+
+    userentity ||--o{ pantry : "보유"
+    pantry ||--o{ pantry_stock : "재고"
+    pantry ||--o{ pantry_history : "변동 기록"
+    pantry_stock }o--|| ingredient_master : "재료"
+    pantry_stock }o--|| unit : "단위"
+    pantry_stock ||--o{ pantry_history : "참조"
+    pantry_history }o--|| ingredient_master : "재료"
+    pantry_history }o--|| unit : "단위"

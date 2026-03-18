@@ -1,0 +1,44 @@
+%%{init: {'er': {'layoutDirection': 'LR'}}}%%
+erDiagram
+    userentity {
+        int id PK
+        varchar username
+    }
+    trade_post {
+        bigint tradePostId PK
+        int user_id FK
+        int buyer_id FK
+        varchar title
+        varchar status
+        int price
+        double latitude
+        double longitude
+    }
+    saved_trade_post {
+        bigint id PK
+        int user_id FK
+        bigint trade_post_id FK
+    }
+    tp_review {
+        bigint tpReviewId PK
+        bigint trade_post_id FK
+        int user_id FK
+        int rating
+        varchar content
+    }
+    chat_rooms {
+        bigint id PK
+        varchar roomKey
+        bigint post_id FK
+        int user_a_id FK
+        int user_b_id FK
+    }
+
+    userentity ||--o{ trade_post : "판매"
+    userentity ||--o{ saved_trade_post : "찜"
+    userentity ||--o{ tp_review : "작성"
+    userentity ||--o{ chat_rooms : "참여(A)"
+    userentity ||--o{ chat_rooms : "참여(B)"
+    trade_post ||--o{ saved_trade_post : "찜됨"
+    trade_post ||--o{ tp_review : "리뷰"
+    trade_post ||--o{ chat_rooms : "채팅방"
