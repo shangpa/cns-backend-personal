@@ -1,0 +1,384 @@
+// CookAndShare (CNS) ERD
+// dbdiagram.io 에 붙여넣어 시각화 가능
+// https://dbdiagram.io
+
+// ───────────────────────────────
+// 사용자
+// ───────────────────────────────
+
+Table userentity {
+  id int [pk, increment]
+  name varchar
+  username varchar [unique]
+  password varchar
+  role varchar
+  point int
+  fridgePointStep int
+  temperature float
+  latitude double
+  longitude double
+  createdAt datetime
+  blocked boolean
+  blockedAt datetime
+  profileImageUrl varchar
+}
+
+Table user_follow {
+  id bigint [pk, increment]
+  follower_id int [not null, ref: > userentity.id]
+  following_id int [not null, ref: > userentity.id]
+  createdAt datetime
+
+  indexes {
+    (follower_id, following_id) [unique]
+  }
+}
+
+Table point_history {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  action varchar(100)
+  pointChange int
+  description varchar
+  createdAt datetime
+}
+
+Table device_token {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  fcmToken varchar
+  platform varchar
+  updatedAt datetime
+}
+
+Table notification_entity {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  category varchar
+  content varchar
+  read boolean [not null]
+  createdAt datetime
+}
+
+// ───────────────────────────────
+// 재료 마스터
+// ───────────────────────────────
+
+Table unit {
+  id bigint [pk, increment]
+  name varchar(20) [not null, unique]
+  kind varchar(10) [not null, note: 'ENUM: WEIGHT / VOLUME / COUNT 등']
+
+  indexes {
+    name [unique, name: 'uq_unit_name']
+  }
+}
+
+Table ingredient_master {
+  id bigint [pk, increment]
+  nameKo varchar(100) [not null, unique]
+  category varchar [not null, note: 'ENUM']
+  default_unit_id bigint [ref: > unit.id]
+  iconUrl varchar(255)
+
+  indexes {
+    nameKo [unique, name: 'uq_ingredient_name_ko']
+  }
+}
+
+// ───────────────────────────────
+// 레시피
+// ───────────────────────────────
+
+Table recipe {
+  recipeId bigint [pk, increment]
+  user_id int [not null, ref: > userentity.id]
+  title varchar
+  category varchar [note: 'ENUM']
+  alternativeIngredients text
+  handlingMethods text
+  cookingSteps text
+  mainImageUrl varchar
+  difficulty varchar [note: 'ENUM']
+  tags varchar
+  cookingTime int
+  servings int
+  createdAt datetime
+  isPublic boolean
+  viewCount int
+  likes int
+  recommends int
+  videoUrl varchar
+  likePointStep int
+  scrapPointStep int
+  isDraft boolean
+  recipeType varchar [note: 'ENUM']
+}
+
+Table recipe_ingredient {
+  id bigint [pk, increment]
+  recipe_id bigint [not null, ref: > recipe.recipeId]
+  ingredient_id bigint [not null, ref: > ingredient_master.id]
+  quantity double
+}
+
+Table like_recipe {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  recipe_id bigint [ref: > recipe.recipeId]
+  likedAt datetime
+}
+
+Table recommend_recipe {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  recipe_id bigint [ref: > recipe.recipeId]
+  recommendedAt datetime
+}
+
+Table review {
+  reviewId bigint [pk, increment]
+  recipe_id bigint [not null, ref: > recipe.recipeId]
+  user_id int [not null, ref: > userentity.id]
+  content varchar(1000) [not null]
+  rating int [not null]
+  mediaUrls text
+  createdAt datetime [not null]
+}
+
+// ───────────────────────────────
+// 팬트리 (식재료 관리 - 현행)
+// ───────────────────────────────
+
+Table pantry {
+  id bigint [pk, increment]
+  user_id int [not null, ref: > userentity.id]
+  name varchar(50) [not null]
+  note varchar(255)
+  imageUrl varchar(255)
+  isDefault boolean [not null]
+  sortOrder int [not null]
+  createdAt datetime [not null]
+
+  indexes {
+    (user_id, name) [unique, name: 'uq_pantry_user_name']
+  }
+}
+
+Table pantry_stock {
+  id bigint [pk, increment]
+  pantry_id bigint [not null, ref: > pantry.id]
+  ingredient_id bigint [not null, ref: > ingredient_master.id]
+  unit_id bigint [not null, ref: > unit.id]
+  quantity decimal(12,3) [not null]
+  storage varchar(10) [not null, note: 'ENUM: FRIDGE / FREEZE / ROOM_TEMP']
+  purchasedAt date
+  expiresAt date
+  memo varchar(255)
+  source varchar [note: 'ENUM: MANUAL / RECEIPT / VISION']
+  createdAt datetime
+  updatedAt datetime
+}
+
+Table pantry_history {
+  id bigint [pk, increment]
+  pantry_id bigint [not null, ref: > pantry.id]
+  ingredient_id bigint [not null, ref: > ingredient_master.id]
+  unit_id bigint [not null, ref: > unit.id]
+  stock_id bigint [ref: > pantry_stock.id]
+  changeQty decimal(12,3) [not null]
+  action varchar(10) [not null, note: 'ENUM: ADD / USE / DISCARD']
+  refType varchar(30) [note: '참조 도메인 타입 (예: RECIPE)']
+  refId bigint [note: '참조 도메인 ID']
+  note varchar(255)
+  purchasedAt date
+  expiresAt date
+  createdAt datetime
+}
+
+// ───────────────────────────────
+// 냉장고 (Legacy - @Deprecated)
+// ───────────────────────────────
+
+Table fridge {
+  id bigint [pk, increment]
+  user_id int [not null, ref: > userentity.id]
+  ingredientName varchar [not null]
+  storageArea varchar [not null]
+  fridgeDate date
+  dateOption int
+  quantity double
+  unitCategory varchar [not null, note: 'ENUM']
+  unitDetail varchar [not null]
+  createdAt datetime
+  updatedAt datetime
+
+  Note: 'Legacy @Deprecated — Pantry 도메인으로 이관 예정'
+}
+
+Table fridge_history {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  ingredientName varchar
+  quantity double
+  unitDetail varchar
+  actionType varchar [note: 'ENUM: ADD / USE']
+  actionDate datetime
+  dateOption int
+  fridgeDate date
+
+  Note: 'Legacy @Deprecated'
+}
+
+// ───────────────────────────────
+// 동네주방 거래
+// ───────────────────────────────
+
+Table trade_post {
+  tradePostId bigint [pk, increment]
+  user_id int [not null, ref: > userentity.id, note: '판매자']
+  buyer_id int [ref: > userentity.id, note: '구매자 (거래 완료 시 설정)']
+  category varchar
+  title varchar
+  quantity double
+  price int
+  purchaseDate date
+  description varchar(1000)
+  latitude double
+  longitude double
+  imageUrls text
+  location varchar
+  status varchar [not null, note: 'TradeStatus ENUM: ONGOING / RESERVED / COMPLETED']
+  viewCount int [not null]
+  updatedAt datetime
+  lastUppedAt datetime
+  createdAt datetime [not null]
+  version bigint [note: 'Optimistic Lock (@Version)']
+}
+
+Table saved_trade_post {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  trade_post_id bigint [ref: > trade_post.tradePostId]
+  savedAt datetime
+}
+
+Table up_history {
+  id bigint [pk, increment]
+  postId bigint [not null, note: 'trade_post 참조 (FK 없음)']
+  userId int [not null, note: 'userentity 참조 (FK 없음)']
+  usedPoints int [not null]
+  reason varchar(32) [not null]
+  createdAt datetime [not null]
+}
+
+Table tp_review {
+  tpReviewId bigint [pk, increment]
+  trade_post_id bigint [not null, ref: > trade_post.tradePostId]
+  user_id int [not null, ref: > userentity.id]
+  content varchar(1000) [not null]
+  rating int [not null]
+  createdAt datetime [not null]
+}
+
+// ───────────────────────────────
+// 채팅
+// ───────────────────────────────
+
+Table chat_rooms {
+  id bigint [pk, increment]
+  roomKey varchar [unique]
+  post_id bigint [ref: > trade_post.tradePostId]
+  user_a_id int [ref: > userentity.id]
+  user_b_id int [ref: > userentity.id]
+  updatedAt datetime
+}
+
+Table chats {
+  id bigint [pk, increment]
+  roomKey varchar [note: 'chat_rooms 참조 (FK 없음)']
+  senderId bigint [note: 'userentity 참조 (FK 없음)']
+  message text
+  createdAt datetime
+}
+
+// ───────────────────────────────
+// 게시판
+// ───────────────────────────────
+
+Table board {
+  id bigint [pk, increment]
+  writer_id int [ref: > userentity.id]
+  content varchar
+  boardType varchar [note: 'ENUM']
+  likeCount int
+  commentCount int [not null]
+  createdAt datetime
+}
+
+Table board_comment {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  board_id bigint [ref: > board.id]
+  content varchar
+  createdAt datetime
+}
+
+Table board_like {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  board_id bigint [ref: > board.id]
+}
+
+Table report {
+  id bigint [pk, increment]
+  reporter_id int [ref: > userentity.id]
+  board_id bigint [ref: > board.id]
+  board_comment_id bigint [ref: > board_comment.id]
+  createdAt datetime
+}
+
+// ───────────────────────────────
+// 숏폼
+// ───────────────────────────────
+
+Table shorts_video {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  title varchar
+  videoUrl varchar
+  thumbnailUrl varchar
+  isPublic boolean [not null]
+  viewCount int
+  likeCount int
+  commentCount int [not null]
+  createdAt datetime
+}
+
+Table short_comment {
+  id bigint [pk, increment]
+  user_id int [ref: > userentity.id]
+  shorts_video_id bigint [ref: > shorts_video.id]
+  content varchar
+  createdAt datetime
+}
+
+// ───────────────────────────────
+// 검색 / 관리자
+// ───────────────────────────────
+
+Table search_keyword {
+  id bigint [pk, increment]
+  keyword varchar
+  searchedAt datetime
+}
+
+Table admin_log {
+  id bigint [pk, increment]
+  adminUsername varchar
+  action varchar
+  targetType varchar
+  targetId bigint
+  reason varchar
+  createdAt datetime
+}
