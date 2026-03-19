@@ -1,4 +1,4 @@
-# Spring Boot 리팩토링 1 — 비밀번호가 GitHub에 올라가기 전에
+# Spring Boot 리팩토링 2 — 비밀번호가 GitHub에 올라가기 전에
 
 안녕하세요, 백엔드 개발자를 꿈꾸는 shangpa입니다.
 
@@ -198,4 +198,4 @@ public ResponseEntity<Recipe> getRecipe(@PathVariable Long id) {
 | 예외처리 파편화 | GlobalExceptionHandler 중앙화 |
 | 에러 응답 포맷 제각각 | `{code, message, timestamp}` 통일 |
 
-> 챕터 2 → 코드 품질 — 로깅, 트랜잭션, 입력 검증
+> 챕터 3 → 코드 품질 — 로깅, 트랜잭션, 입력 검증

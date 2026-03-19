@@ -1,4 +1,4 @@
-# Spring Boot 리팩토링 2 — System.out.println 을 지워야 했던 이유
+# Spring Boot 리팩토링 3 — System.out.println 을 지워야 했던 이유
 
 안녕하세요, 백엔드 개발자를 꿈꾸는 shangpa입니다.
 
@@ -209,4 +209,4 @@ public ResponseEntity<?> createRecipe(@Valid @RequestBody RecipeDTO dto, Authent
 | 모든 메서드에 동일한 @Transactional | 조회: readOnly=true, 변경: 기본 |
 | 입력 검증 없음 | @Valid + @NotBlank + GlobalExceptionHandler |
 
-> 챕터 3 → 도메인 모델 — Enum과 레거시 처리
+> 챕터 4 → 도메인 모델 — Enum과 레거시 처리
