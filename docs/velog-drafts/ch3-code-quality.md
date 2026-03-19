@@ -162,7 +162,7 @@ HTTP 요청 → @RequestBody RecipeDTO dto
     ↓ (위반 시)
 MethodArgumentNotValidException 발생
     ↓
-GlobalExceptionHandler.handleValidation() 처리
+GlobalExceptionHandler (@ExceptionHandler 매핑)
     ↓
 400 Bad Request + 에러 메시지 반환
 ```

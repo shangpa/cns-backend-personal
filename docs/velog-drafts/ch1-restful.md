@@ -2,7 +2,7 @@
 
 안녕하세요, 백엔드 개발자를 꿈꾸는 shangpa입니다.
 
-이번에 졸업 작품으로 완성한 프로젝트의 API를 리팩토링했습니다.
+이번에 팀 프로젝트로 완성한 프로젝트의 API를 리팩토링했습니다.
 기능은 이미 다 동작하고 있었는데, swagger로 보니 불편하더라고요.
 
 ```
@@ -71,7 +71,7 @@ REST 설계는 알고 있었지만 규칙에 맞게 만들지 않았습니다.
 | 내 정보 조회 | `GET /api/user/profile` | `GET /api/users/me` |
 | ID로 이름 조회 | `GET /api/user/profile-by-id` | `GET /api/users/{id}/name` |
 | 유저명으로 ID 조회 | `GET /api/user/id` | `GET /api/users?username={username}` |
-| 비밀번호 확인 | `POST /api/user/check-password` | `POST /api/user/auth/verify-password` |
+| 비밀번호 확인 | `POST /api/user/check-password` | `POST /api/users/auth/verify-password` |
 
 **포인트 정리:**
 - `update`, `profile` 같은 불필요한 단어 제거
@@ -98,7 +98,7 @@ REST 설계는 알고 있었지만 규칙에 맞게 만들지 않았습니다.
 **포인트 정리:**
 - 자원 이름은 **복수형**으로 통일 (`like` → `likes`)
 - `toggle`, `save` 같은 동사 제거 → 실제 로직(토글 여부)은 서버 내부에서 처리
-- "내가 찜한 목록" 같은 **내 소유의 데이터는 `/users/me/` 하위로** 이동
+- 상태를 표현할 땐 형용사형 명사 사용 (`saved` → `bookmarked`, `like/list` → `liked`)
 
 ---
 
