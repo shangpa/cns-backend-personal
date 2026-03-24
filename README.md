@@ -47,9 +47,10 @@
 | Persistence | Spring Data JPA, MySQL |
 | Messaging | WebSocket (STOMP) |
 | Notification | Firebase FCM |
-| External API | OpenAI API (이미지 생성), Google Cloud Vision, Google Translate API |
+| External API | OpenAI API (이미지 생성, 데모 환경에서는 비용 절감을 위해 비활성화), Google Cloud Vision, Google Translate API |
 | Docs | Springdoc OpenAPI (Swagger UI) |
-| Infra | Lombok, Gradle |
+| Infra | Docker, docker-compose, OCI ARM VM (Always Free) |
+| CI/CD | GitHub Actions |
 
 ---
 
@@ -66,7 +67,7 @@ DB_USERNAME=root
 DB_PASSWORD=your_password_here
 
 # JWT
-JWT_SECRET=your_jwt_secret_here   # 256-bit 이상 랜덤 문자열 권장
+JWT_SECRET=your_jwt_secret_here
 
 # Google API
 GOOGLE_API_KEY=your_google_api_key_here
@@ -101,9 +102,51 @@ http://localhost:8080/swagger-ui/index.html
 
 ---
 
+## Deployment (OCI + Docker)
+
+Oracle Cloud Infrastructure ARM VM (Always Free) 위에 Docker Compose로 배포
+
+main 브랜치에 push하면 GitHub Actions가 자동으로 서버에 배포
+
+### 서버 구성
+
+| 항목 | 내용 |
+|------|------|
+| 서버 | OCI ARM A1 VM (Ubuntu 22.04, 4 OCPU / 24GB RAM) |
+| 컨테이너 | Docker + docker-compose |
+| 앱 | Spring Boot (`:8080`) |
+| DB | MySQL 8.0 (컨테이너, VM 내부 전용) |
+| CI/CD | GitHub Actions — main push 시 자동 배포 |
+
+### CI/CD 흐름
+
+```
+git push → main
+    ↓ GitHub Actions 자동 실행
+SSH → OCI VM → git pull → docker-compose up --build
+```
+
+### 환경변수 (VM의 .env)
+
+서버에는 `.env` 파일을 직접 생성 (Git에 포함되지 않음)
+
+| 변수 | 설명 |
+|------|------|
+| `DB_PASSWORD` | MySQL root 패스워드 |
+| `JWT_SECRET` | JWT 서명 키 (256bit 이상 랜덤 문자열) |
+| `GOOGLE_API_KEY` | Google Cloud Vision / Translate |
+| `OPENAI_API_KEY` | OpenAI 이미지 생성 (비용 문제로 현재 비활성화, 키 등록 시 즉시 활성화) |
+
+시크릿 파일은 별도로 VM에 직접 복사:
+- `src/main/resources/gcp-key.json`
+- `src/main/resources/firebase/serviceAccountKey.json`
+- `src/main/resources/api.properties`
+
+---
+
 ## 주요 기능
 
-- **AI 레시피 썸네일 생성**: OpenAI API + `@Async` 비동기 처리 → 레시피 저장 즉시 응답, 이미지는 백그라운드 생성
+- **AI 레시피 썸네일 생성**: OpenAI API + `@Async` 비동기 처리 → 레시피 저장 즉시 응답, 이미지는 백그라운드 생성 (데모 환경에서는 API 비용 절감을 위해 비활성화, 키 등록 시 즉시 활성화)
 - **스마트 식재료 인식**: Google Vision API로 영수증/이미지를 분석하여 식재료 자동 등록
 - **위치 기반 동네주방**: 이웃 간 식재료 거래 + WebSocket(STOMP) 실시간 채팅
 - **Firebase 푸시 알림**: 거래 요청 등 이벤트 발생 시 FCM 알림 발송
