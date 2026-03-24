@@ -29,6 +29,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
     volumes:
+      - ./uploads:/app/uploads
       - ./src/main/resources/gcp-key.json:/app/src/main/resources/gcp-key.json:ro
       - ./src/main/resources/firebase/serviceAccountKey.json:/app/src/main/resources/firebase/serviceAccountKey.json:ro
       - ./src/main/resources/api.properties:/app/src/main/resources/api.properties:ro
