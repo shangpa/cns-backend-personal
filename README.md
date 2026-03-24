@@ -63,7 +63,7 @@
 ```properties
 # Database
 DB_URL=jdbc:mysql://localhost:3306/cns?serverTimezone=UTC&characterEncoding=UTF-8
-DB_USERNAME=root
+DB_USERNAME=cns_user
 DB_PASSWORD=your_password_here
 
 # JWT
@@ -132,7 +132,8 @@ SSH → OCI VM → git pull → docker-compose up --build
 
 | 변수 | 설명 |
 |------|------|
-| `DB_PASSWORD` | MySQL root 패스워드 |
+| `DB_PASSWORD` | MySQL cns_user 패스워드 (앱 전용 계정, cns DB만 접근 가능) |
+| `DB_ROOT_PASSWORD` | MySQL root 패스워드 (관리용, 앱에서 직접 사용 안 함) |
 | `JWT_SECRET` | JWT 서명 키 (256bit 이상 랜덤 문자열) |
 | `GOOGLE_API_KEY` | Google Cloud Vision / Translate |
 | `OPENAI_API_KEY` | OpenAI 이미지 생성 (비용 문제로 현재 비활성화, 키 등록 시 즉시 활성화) |
