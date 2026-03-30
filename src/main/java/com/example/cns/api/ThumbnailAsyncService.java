@@ -5,6 +5,7 @@ import com.example.cns.recipe.Recipe;
 import com.example.cns.recipe.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +18,17 @@ public class ThumbnailAsyncService {
     private final RecipeRepository recipeRepository;
     private final OpenAiService openAiService;
 
+    @Value("${openai.api.key:}")
+    private String openAiApiKey;
+
     // 핵심: 이 메서드만 백그라운드 스레드에서 돌아갑니다.
     @Async
     @Transactional
     public void generateAndSaveThumbnailAsync(Long recipeId, String prompt) {
+        if (openAiApiKey == null || openAiApiKey.isBlank()) {
+            log.info("OPENAI_API_KEY 미설정 — 썸네일 자동 생성 스킵 (recipeId={})", recipeId);
+            return;
+        }
         try {
             // 1. 시간이 오래 걸리는 외부 API 호출 (비동기)
             String imageUrl = openAiService.generateThumbnail(prompt);
