@@ -28,6 +28,10 @@ services:
       SPRING_DATASOURCE_USERNAME: cns_user
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SPRINGDOC_API_DOCS_ENABLED: "false"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "false"
     volumes:
       - ./uploads:/app/uploads
       - ./src/main/resources/gcp-key.json:/app/src/main/resources/gcp-key.json:ro
