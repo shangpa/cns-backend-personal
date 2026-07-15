@@ -10,7 +10,7 @@ import java.util.Collections;
 
 @Slf4j
 public class GoogleTokenVerifierUtil {
-    private static final String CLIENT_ID = "207116637821-9s9rbj2mn86707fg9khds5o2b78m7h2q.apps.googleusercontent.com";
+    private static final String CLIENT_ID = "804313905644-lnp959rv01pfd058t441pfp3oinmtfaj.apps.googleusercontent.com";
 
     public static GoogleIdToken.Payload verify(String idTokenString) {
         try {
