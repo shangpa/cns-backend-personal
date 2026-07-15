@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Base64;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +49,7 @@ public class OpenAiService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         JSONObject body = new JSONObject();
-        body.put("model", "dall-e-3");
+        body.put("model", "gpt-image-2");
         body.put("prompt", translatedPrompt);
         body.put("n", 1);
         body.put("size", "1024x1024");
@@ -58,15 +59,38 @@ public class OpenAiService {
 
 
         JSONObject responseJson = new JSONObject(response.getBody());
-        String openAiImageUrl = responseJson.getJSONArray("data").getJSONObject(0).getString("url");
+        JSONObject imageData = responseJson.getJSONArray("data").getJSONObject(0);
+        String openAiImageUrl = imageData.optString("url", "");
+        String localImageUrl;
+        if (imageData.has("b64_json")) {
+            localImageUrl = storeBase64ImageLocally(imageData.getString("b64_json"));
+        } else if (!openAiImageUrl.isBlank()) {
+            localImageUrl = downloadAndStoreImageLocally(openAiImageUrl);
+        } else {
+            throw new IllegalStateException("OpenAI image response did not contain image data");
+        }
 
         log.debug("OpenAI 이미지 생성 URL: {}", openAiImageUrl);
 
         // 🔽 여기가 핵심: 외부 이미지 → 서버 저장 → 내부 URL 반환
-        String localImageUrl = downloadAndStoreImageLocally(openAiImageUrl);
         log.debug("서버에 저장된 썸네일 URL: {}", localImageUrl);
 
         return localImageUrl;
+    }
+
+    private String storeBase64ImageLocally(String base64Image) {
+        try {
+            Path uploadPath = Paths.get("uploads/");
+            Files.createDirectories(uploadPath);
+
+            String fileName = UUID.randomUUID() + ".png";
+            Path filePath = uploadPath.resolve(fileName);
+            Files.write(filePath, Base64.getDecoder().decode(base64Image));
+
+            return "/uploads/" + fileName;
+        } catch (Exception e) {
+            throw new RuntimeException("Thumbnail save failed: " + e.getMessage(), e);
+        }
     }
 
     public String downloadAndStoreImageLocally(String imageUrl) {
