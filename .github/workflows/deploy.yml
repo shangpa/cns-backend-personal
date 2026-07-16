@@ -20,5 +20,6 @@ jobs:
             cd ~/cns-backend-personal-main
             git pull --ff-only origin main
             sudo -n docker-compose build app
+            sudo -n docker rm -f cns-app || true
             sudo -n docker-compose up -d --no-deps app
             sudo -n docker image prune -f
