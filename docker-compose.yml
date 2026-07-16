@@ -14,6 +14,8 @@ services:
       - mysql-data:/var/lib/mysql
     ports:
       - "127.0.0.1:3306:3306"
+    networks:
+      - cns-net
 
   app:
     build: .
@@ -38,6 +40,13 @@ services:
       - ./src/main/resources/gcp-key.json:/app/src/main/resources/gcp-key.json:ro
       - ./src/main/resources/firebase/serviceAccountKey.json:/app/src/main/resources/firebase/serviceAccountKey.json:ro
       - ./src/main/resources/api.properties:/app/src/main/resources/api.properties:ro
+    networks:
+      - cns-net
 
 volumes:
   mysql-data:
+
+networks:
+  cns-net:
+    external: true
+    name: cns-net
